@@ -6,50 +6,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="description" content="MovieHub - Trang phim trực tuyến: Xem phim lẻ, phim bộ, hoạt hình, TV show, anime chất lượng cao, giao diện đẹp, chia sẻ link dễ dàng, trải nghiệm mượt trên mọi thiết bị!"/>
   <style>
-    body {background:#181818;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;color:#fff;}
-    html,body{min-height:100vh;}
+    html,body {min-height:100vh; margin:0; padding:0; background:#181818;}
+    body { color:#fff; font-family:'Segoe UI',Arial,sans-serif;}
+    * { box-sizing: border-box; }
     ::-webkit-scrollbar { width: 8px; background: #232323;}
     ::-webkit-scrollbar-thumb { background: #e50914; border-radius:5px;}
     header {position:sticky;top:0;z-index:3000;background:rgba(32,32,32,0.99);padding:13px 18px 13px 24px;display:flex;gap:17px;align-items:center;box-shadow:0 2px 14px #1114;}
-    header h1 {margin:0;font-size:2.15em;color:#e50914;font-weight:700;letter-spacing:.5px; text-shadow:0 2px 12px #000c;}
+    header h1 {margin:0;font-size:2.1em;color:#e50914;font-weight:700;letter-spacing:.5px;text-shadow:0 2px 12px #000c;}
     #search,#genres{padding:8px 17px;font-size:1em;border-radius:7px;border:none;background:#232323;color:#fff;}
     #search:focus,#genres:focus{box-shadow:0 2px 9px #e5091442;}
-    .hero{width:100vw;min-height:220px;max-height:35vw;background:#232323 url('https://images.unsplash.com/photo-1465101162946-4377e57745c3?auto=format&fit=crop&w=900&q=60') no-repeat center/cover;position:relative;box-shadow:0 15px 60px #0008 inset;}
-    .hero-info{position:absolute;bottom:20px;left:52px;max-width:44vw;color:#fff;text-shadow:0 3px 15px #000b;}
-    .hero-title{font-size:2.2em;font-weight:bold;margin:0 0 7px 0;color:#fff;}
-    .hero-desc{font-size:1.14em;opacity:.97;margin:0 0 10px 0;color:#e2e2e2;}
-    .hero-btn{padding:11px 28px;font-size:1.12em;font-weight:bold;background:#e50914;color:#fff;border:none;border-radius:40px;margin-top:7px;cursor:pointer;transition:.15s;}
+    .hero{width:100%;min-height:215px;max-height:340px;background:#231b29 url('https://images.unsplash.com/photo-1465101162946-4377e57745c3?auto=format&fit=crop&w=1200&q=60') no-repeat center/cover;position:relative;box-shadow:0 15px 60px #0008 inset;overflow:hidden;}
+    .hero::after {content:"";position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(120deg,transparent 55%,#181818 100%);}
+    .hero-info{position:relative;z-index:2;padding:38px 5vw 15px 58px;max-width:56vw;color:#fff;text-shadow:0 3px 15px #000b;}
+    .hero-title{font-size:2.2em;font-weight:900;margin:0 0 9px 0;color:#fff;}
+    .hero-desc{font-size:1.14em;opacity:.97;margin:0 0 12px 0;color:#e2e2e2;}
+    .hero-btn{padding:13px 32px;font-size:1.13em;font-weight:700;background:#e50914;color:#fff;border:none;border-radius:40px;margin-top:10px;cursor:pointer;transition:.15s;box-shadow:0 2px 12px #111c;}
     .hero-btn:hover{background:#bf0e19;}
     .row-title{font-size:1.11em;color:#ffef79;margin:32px 30px 10px 24px;font-weight:700;letter-spacing:.5px;}
     .movie-row{display:flex;flex-direction:row;overflow-x:auto;gap:28px;padding:0 2vw 18px 2vw;scroll-behavior:smooth;}
-    .movie-card{width:196px;min-width:196px;background:linear-gradient(120deg,#232323 83%,#181818 100%);border-radius:16px;overflow:hidden;margin-bottom:17px;box-shadow:0 6px 29px #0005;cursor:pointer;position:relative;transition:transform .16s,box-shadow .18s;}
-    .movie-card:hover{transform:scale(1.07) translateY(-6px);box-shadow:0 18px 40px #e5091428;}
-    .movie-poster{width:100%;aspect-ratio:2/3;object-fit:cover;}
-    .movie-info{padding:11px 13px 15px 13px; color:#fff;}
-    .movie-title{font-size:1.12em;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;}
+    .movie-card{width:182px;min-width:182px;background:linear-gradient(120deg,#222 82%,#191818 100%);border-radius:15px;overflow:hidden;margin-bottom:18px;box-shadow:0 6px 29px #0005;cursor:pointer;position:relative;transition:transform .16s,box-shadow .18s;}
+    .movie-card:hover{transform:scale(1.065) translateY(-7px);box-shadow:0 18px 40px #e5091428;}
+    .movie-poster{width:100%;aspect-ratio:2/3;object-fit:cover;background:#222;display:block;}
+    .movie-info{padding:10px 14px 15px 14px;min-height:52px;}
+    .movie-title{font-size:1.13em;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;}
     .movie-genre,.movie-year{font-size:0.99em;opacity:.82;color:#fffd;}
-    .movie-rating{color:#fadb3a;font-weight:bold; font-size:1.04em;}
-    .movie-desc{color:#e2e2e2;font-size:.95em;}
-    .badge-new {background:#e50914;color:#fff;position:absolute;top:7px;left:7px;padding:2px 13px;border-radius:8px;font-size:.93em;}
-    #modal-player{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(12,12,16,0.96);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;z-index:5000;overflow-x:auto;}
-    #modal-content{background:#222; border-radius:21px; padding:29px 12px 18px 12px; max-width:96vw;width:97vw; box-shadow:0 17px 49px #000a;position:relative;color:#fff;}
+    .movie-rating{color:#fadb3a;font-weight:bold;font-size:1.03em;}
+    .movie-desc{color:#e2e2e2;font-size:.97em;margin-top:4px;}
+    .badge-new {background:#e50914;color:#fff;position:absolute;top:7px;left:7px;padding:2px 13px;border-radius:8px;font-size:.92em;}
+    #modal-player{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(12,12,16,0.97);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;z-index:5000;}
+    #modal-content{background:#232323;border-radius:20px;padding:25px 12px 17px 12px;max-width:94vw;width:97vw;box-shadow:0 17px 49px #000a;position:relative;color:#fff;}
     #player{text-align:center;margin-bottom:17px;}
-    #player iframe{width:100%;max-width:98vw;height:49vw;max-height:350px;min-height:170px;border-radius:13px;box-shadow:0 1.5px 13px #e5091440;}
+    #player iframe{width:100%;max-width:97vw;height:43vw;max-height:335px;min-height:170px;border-radius:13px;box-shadow:0 0.6px 10px #e5091445;}
     #close-btn{background:#e50914;color:#fff;border:none;border-radius:9px;padding:10px 13px;font-size:1em;cursor:pointer;font-weight:600;position:absolute;right:13px;top:13px;}
     #close-btn:hover{background:#bd070a;}
-    #detail-title{font-size:1.22em;font-weight:700;margin:7px 0 7px 0;color:#ffe27a;text-shadow:0 2px 7px #111b;}
+    #detail-title{font-size:1.21em;font-weight:700;margin:7px 0 8px 0;color:#ffe27a;text-shadow:0 2px 7px #111d;}
     #movie-detail, #detail-desc, #movie-detail *{color:#fff !important;}
-    #detail-desc{font-size:1em;color:#e0e0e0!important;margin:7px 0;}
+    #detail-desc{font-size:1em;color:#e0e0e0;margin:7px 0;}
     .share-btn{float:right;margin-top:-5px;padding:7px 16px;background:#ffe066;color:#111;font-size:.97em;font-weight:bold;border:none;border-radius:13px;cursor:pointer;}
     .share-btn:hover{background:#edb800;}
     #suggestion-title{font-size:1.07em;margin:12px 0 7px 0;color:#ffef79;}
     .suggest-row{display:flex;gap:14px;overflow-x:auto;}
-    .suggest-card{width:88px;min-width:88px;border-radius:8px;overflow:hidden;background:#252527;box-shadow:0 1px 7px #0003;cursor:pointer;transition:transform .11s;}
+    .suggest-card{width:80px;min-width:80px;border-radius:8px;overflow:hidden;background:#252527;box-shadow:0 1px 7px #0003;cursor:pointer;transition:transform .11s;}
     .suggest-card img{width:100%;aspect-ratio:2/3;object-fit:cover;}
     .suggest-card:hover{transform:scale(1.08);}
-    .s-title{font-size:.96em;font-weight:600;padding:3px 2px 1px 2px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;}
-    @media (max-width:700px){.movie-card{width:38vw;min-width:95px;}.movie-info{padding:10px;}}
-    @media (max-width:550px){.movie-card{width:54vw;min-width:63px;}#modal-content{padding:7px 1vw;width:100vw;max-width:100vw;}#player iframe{height:34vw;min-height:125px;max-height:200px;}}
+    .s-title{font-size:.95em;font-weight:600;padding:3px 2px 1px 2px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;}
+    @media (max-width:860px){.movie-card{width:36vw;min-width:94px;}.hero-info{max-width:93vw;padding:33px 5vw 12px 18px;}}
+    @media (max-width:550px){
+      .movie-card{width:52vw;min-width:61px;}
+      #modal-content{padding:7px 2vw;width:100vw;max-width:100vw;}
+      #player iframe{height:31vw;min-height:110px;max-height:185px;}
+      .hero-info{max-width:94vw;padding:27px 7vw 12px 15px;}
+    }
     footer{color:#bababa;text-align:center;padding:15px 0 7px 0;font-size:.97em;}
     a,a:visited{color:#ffe27a;}
   </style>
@@ -63,7 +70,7 @@
   <section class="hero">
     <div class="hero-info" id="hero-info">
       <div class="hero-title">MovieHub - Xem phim Online miễn phí</div>
-      <div class="hero-desc">Phim lẻ, phim bộ, hoạt hình, TV show, anime chất lượng cao. Giao diện hiện đại. Chia sẻ link từng phim dễ dàng, tự động nhận diện khi xem.</div>
+      <div class="hero-desc">Phim lẻ, phim bộ, hoạt hình, TV show, anime chất lượng cao. Giao diện hiện đại, tối ưu mọi thiết bị. Chia sẻ link từng phim dễ dàng!</div>
       <button class="hero-btn" onclick="scrollToMain()">Xem ngay</button>
     </div>
   </section>
@@ -78,7 +85,7 @@
     </div>
   </div>
   <footer>
-    &copy; 2025 MovieHub. Trang web xem phim trực tuyến miễn phí, chia sẻ link nhanh. Powered by Google Sheets/Drive.
+    &copy; 2025 MovieHub. Trang xem phim online miễn phí – Giao diện đẹp, chia sẻ link từng phim dễ dàng.
   </footer>
   <script>
   const SHEET_ID = '15mFrve7Z-_zi_7AvSq3t9Nti1VjINVHCQDF7LRmP1QQ';
