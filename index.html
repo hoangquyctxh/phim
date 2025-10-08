@@ -2,66 +2,84 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
-  <title>Phim Online Streaming Pro (Google Drive/Sheets)</title>
+  <title>Phim Online Streaming (Netflix Style)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
-    html, body { margin:0; padding:0; background: radial-gradient(ellipse at top left, #181818 0%, #232323 100%); min-height:100vh;}
-    body { color: #fff; font-family: 'Segoe UI', Arial, sans-serif; overflow-x:hidden;}
-    ::-webkit-scrollbar { width: 8px; background: #222;}
+    html, body { margin:0; padding:0; background:linear-gradient(120deg, #181818 70%, #262626 100%); min-height:100vh;}
+    body { color: #fff; font-family:'Segoe UI',Arial,sans-serif; }
+    ::-webkit-scrollbar { width: 8px; background: #232323;}
     ::-webkit-scrollbar-thumb { background: #e50914; border-radius:5px;}
-    header {position:sticky; top:0; z-index:1000; background:rgba(30,30,30,0.98); backdrop-filter:blur(2px); padding:14px 18px; 
-      display:flex; flex-direction:row; align-items:center; gap:12px; box-shadow:0 3px 18px #0002;}
-    header h1 { margin:0; font-size:2em; color:#e50914; font-weight:700; letter-spacing:.5px;}
-    #search, #genres { padding:8px 13px; background:#232323; color:#fff; border:1px solid #292929; border-radius:7px; margin:0 4px;
-      font-size:1em; box-shadow:0 2px 7px #0002;}
-    #search:focus, #genres:focus {border:1px solid #e50914;}
+    header { position:sticky; top:0; z-index:999; background:#222;
+      padding:14px 24px; display:flex; gap:15px; align-items:center; box-shadow:0 8px 21px #0003;}
+    header h1 { margin:0; font-size:2em; color:#e50914; font-weight:700;}
+    #search, #genres {
+      padding:8px 16px; font-size:1em; border-radius:7px; border:none;
+      background:#262626; color:#fff; min-width:190px; outline:none;
+      box-shadow:0 1px 2px #0002;
+    }
+    #search:focus, #genres:focus { box-shadow:0 2px 10px #e5091444; }
     main {margin-bottom:40px;}
-    .row-title {font-size:1.15em; color: #ffe27a; margin:17px 30px 7px 17px; font-weight:600; letter-spacing:.5px;}
-    .movie-row {display:flex; flex-direction:row; overflow-x:auto; padding:7px 4vw 14px 2vw; scroll-behavior:smooth;}
-    .movie-row::-webkit-scrollbar{height:5px;}
+    .row-title {font-size:1.11em; color: #ffe27a; margin:24px 30px 10px 24px; font-weight:700; letter-spacing:.5px;}
+    .movie-row {display:flex; flex-direction:row; overflow-x:auto; gap:24px; padding:0 2vw 14px 2vw;}
+    .movie-row::-webkit-scrollbar{height:4px;}
     .movie-row::-webkit-scrollbar-thumb{background:#e50914;}
-    .movie-card { width:170px; min-width:170px; background:#232323b8; border-radius:15px; overflow:hidden; margin:0 10px; margin-bottom:18px;
-      box-shadow:0 8px 23px #0004; cursor:pointer; position:relative; transition:transform .21s, box-shadow .18s;
+    .movie-card { width:200px; min-width:200px; background:linear-gradient(120deg,#232323 85%,#181818 100%);
+      border-radius:15px; overflow:hidden; margin-bottom:18px; box-shadow:0 8px 21px #0005; cursor:pointer;
+      position:relative; transition:transform .19s, box-shadow .18s;
       display:flex; flex-direction:column;}
-    .movie-card:hover { transform:scale(1.08) translateY(-7px); filter:brightness(1.05); box-shadow:0 9px 32px #e5091430;}
-    .movie-poster { width:100%; aspect-ratio:2/3; object-fit:cover; transition:filter .21s;}
-    .movie-card:hover .movie-poster { filter:brightness(0.85);}
-    .movie-info { padding:9px 10px 13px 11px;}
-    .movie-title { font-size:1.07em;font-weight:600; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow: ellipsis;}
-    .movie-genre, .movie-year, .movie-rating { font-size:0.93em; opacity:.8;}
+    .movie-card:hover { transform:scale(1.085) translateY(-3px); box-shadow:0 18px 45px #e5091435;}
+    .movie-card:active {transform:scale(.98);}
+    .movie-poster { width:100%; aspect-ratio:2/3; object-fit:cover; transition:filter .19s;}
+    .movie-card:hover .movie-poster { filter:brightness(0.87);}
+    .movie-info {
+      padding:11px 11px 13px 14px; display:flex; flex-direction:column;
+      flex:1 1 auto;
+    }
+    .movie-title { font-size:1.16em;font-weight:600; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow: ellipsis;}
+    .movie-genre, .movie-year, .movie-rating { font-size:0.97em; opacity:.79;}
     .movie-rating { color:#ffe27a; font-weight:bold;}
+    .badge-new {background:#e50914;color:#fff;position:absolute;top:7px;left:7px;padding:2px 13px;border-radius:8px;font-size:.93em;}
+    /* Modal */
     #modal-player {
-      position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(16,16,19,0.92);backdrop-filter:blur(7px); 
-      display:none; align-items:center; justify-content:center; z-index:10000; animation:fadeinModal .33s; overflow-y:auto;
+      position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(10,10,14,0.94);backdrop-filter: blur(8px);
+      display:none; align-items:center; justify-content:center; z-index:9999; overflow-y:auto; animation:fadeinModal .33s;
     }
-    @keyframes fadeinModal {from{opacity:0;} to{opacity:1;}}
+    @keyframes fadeinModal { from{opacity:0;} to{opacity:1;} }
     #modal-content {
-      background:linear-gradient(120deg,#252522 70%,#212223 100%); border-radius:22px; padding:38px 18px 28px 18px; width:98vw; max-width:865px;
-      box-shadow:0 14px 48px #e5091439,0 2px 19px #15121745; animation:bounceIn .35s; position:relative;
+      background:linear-gradient(120deg,#252522 70%,#212223 100%);
+      border-radius:21px; padding:32px 22px 24px 22px;
+      max-width:830px; width:98vw;
+      box-shadow:0 14px 46px #e5091439,0 2px 18px #151217;
+      animation:bounceIn .32s; position:relative;
     }
-    @keyframes bounceIn { 0%{transform:scale(.6);} 70%{transform:scale(1.11);} 100%{transform:scale(1);} }
-    #player { text-align:center; margin-bottom:19px; border-radius:13px; }
-    #player iframe { box-shadow:0 0 9px #e5091465; border-radius:13px;}
+    @keyframes bounceIn { 0%{transform:scale(.5);} 75%{transform:scale(1.07);} 100%{transform:scale(1);} }
+    #player { text-align:center; margin-bottom:17px; }
+    #player iframe { border-radius:12px; box-shadow:0 1px 9px #e5091465;}
     #close-btn {
-      background:#e50914; color:#fff; border:none; border-radius:12px; padding:11px 15px; font-size:1.06em; cursor:pointer;
-      font-weight:bold; position:absolute;right:14px;top:14px; min-width:59px; transition:.17s;
-      box-shadow:0 1px 7px #e5091422;z-index:10;
+      background:#e50914; color:#fff; border:none; border-radius:10px; padding:10px 16px;
+      font-size:1em; cursor:pointer; font-weight:600; position:absolute;right:17px;top:17px; transition:.17s;
+      box-shadow:0 2px 10px #e5091460;
     }
     #close-btn:hover {background:#b0060f;}
-    #movie-detail { color:#fff; margin-bottom:13px;}
-    #detail-title { font-size:1.33em; font-weight:700; color:#ffe27a; margin:0;}
-    #detail-genre,#detail-year,#detail-rating{display:inline-block;margin-right:14px;}
-    #detail-poster { float:left; width:152px; border-radius:14px; margin-right:20px; box-shadow:0 3px 11px #e5091426;}
-    #detail-desc { font-size:1.01em; margin-top:5px;}
+    #movie-detail { color:#fff;}
+    #detail-title { font-size:1.38em; font-weight:700; margin:7px 0 7px 0; color:#ffe27a;}
+    #detail-desc { font-size:1em;}
+    #suggestion-title{font-size:1.07em;margin:17px 0 8px 0;}
+    .suggest-row{display:flex;gap:17px;overflow-x:auto;}
+    .suggest-card{width:95px;min-width:95px;border-radius:9px;overflow:hidden;background:#252527;box-shadow:0 2px 10px #0003;cursor:pointer;transition:transform .13s;}
+    .suggest-card img{width:100%;aspect-ratio:2/3;object-fit:cover;}
+    .suggest-card:hover{transform:scale(1.07);}
+    .s-title{font-size:.97em;font-weight:600;padding:3px 3px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     @media (max-width:700px){
-      #modal-content {padding:8px 0;max-width:100vw;}
-      .movie-card{width:37vw;min-width:105px;}
-      .movie-row{padding:7px 1vw 11px 1vw;}
+      #modal-content {padding:7px .5vw;max-width:100vw;}
+      .movie-card{width:39vw;}
+      .suggest-card{width:21vw;min-width:61px;}
     }
     @media (max-width:500px){
-      .movie-card{width:47vw;min-width:85px;}
+      .movie-card{width:49vw;}
+      .suggest-card{width:26vw;min-width:55px;}
     }
-    footer{color:#aaa;text-align:center;padding:23px 0 11px 0;font-size:.99em;}
+    footer{color:#aaa;text-align:center;padding:16px 0;font-size:.97em;margin-top:34px;}
     a, a:visited{color:#ffe27a;}
   </style>
 </head>
@@ -72,41 +90,39 @@
     <select id="genres"><option value="">Tất cả thể loại</option></select>
   </header>
   <main id="movie-rows"></main>
-  <!-- Modal player -->
   <div id="modal-player">
     <div id="modal-content">
       <button id="close-btn" onclick="closePlayer()">Đóng</button>
       <div id="player"></div>
       <div id="movie-detail"></div>
+      <div id="suggestion-title"></div>
+      <div class="suggest-row" id="suggest-row"></div>
     </div>
   </div>
   <footer>
-    &copy; 2025 Phim Online. <a href="https://github.com/" target="_blank">Github</a>
+    &copy; 2025 Phim Online. <a href="#">Github</a> • Powered by Google Sheets/Drive. 
   </footer>
   <script>
-  // ---- ĐÂY LÀ PHẦN CODE SCRIPT CHUẨN VỚI GOOGLE SHEET HEADER TIẾNG VIỆT ----
-  const SHEET_ID = '15mFrve7Z-_zi_7AvSq3t9Nti1VjINVHCQDF7LRmP1QQ'
-  const API_KEY = 'AIzaSyD5dWLgYZPu1_-AkwAaHPClGOOQ-Lq5EGI'
-  const SHEET_RANGE = 'Sheet1!A1:K'
+  // Config Google Sheet đúng header tiếng Việt
+  const SHEET_ID = '15mFrve7Z-_zi_7AvSq3t9Nti1VjINVHCQDF7LRmP1QQ';
+  const API_KEY = 'AIzaSyD5dWLgYZPu1_-AkwAaHPClGOOQ-Lq5EGI';
+  const SHEET_RANGE = 'Sheet1!A1:K';
   let movieData = [], genres = new Set();
   let currentMovie = null;
-
   async function fetchMovies() {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_RANGE}?key=${API_KEY}`;
-    const res = await fetch(url);
-    const data = await res.json();
+    const res = await fetch(url); const data = await res.json();
     const rows = data.values || [];
     if(!rows.length) return movieData = [];
     const header = rows[0].map(h => h.trim().toLowerCase());
     const idxTitle    = header.findIndex(x => x==="tên phim");
     const idxDesc     = header.findIndex(x => x==="mô tả");
     const idxGenre    = header.findIndex(x => x==="thể loại");
-    const idxDrive    = header.findIndex(x => x.indexOf("drive")>=0);
-    const idxPoster   = header.findIndex(x => x.indexOf("poster")>=0);
+    const idxDrive    = header.findIndex(x => x.includes("drive"));
+    const idxPoster   = header.findIndex(x => x.includes("poster"));
     const idxYear     = header.findIndex(x => x==="năm");
-    const idxRating   = header.findIndex(x => x.indexOf("điểm")>=0);
-    const idxID       = header.findIndex(x => x.indexOf("id")>=0);
-
+    const idxRating   = header.findIndex(x => x.includes("điểm"));
+    const idxID       = header.findIndex(x => x.includes("id"));
     movieData = rows.slice(1).map(row => ({
       title:  row[idxTitle]  || "",
       desc:   row[idxDesc]   || "",
@@ -115,23 +131,22 @@
       poster: row[idxPoster] || "",
       year:   row[idxYear]   || "",
       rating: parseFloat(row[idxRating]||"0"),
-      id:     row[idxID]     || ""
+      id:     row[idxID]     || "",
+      isNew:  row[idxYear] >= (new Date().getFullYear()-1) // badge Mới
     })).filter(m => m.title && m.id);
     genres = new Set(movieData.map(m=>m.genre));
   }
-
   function renderGenres() {
     const sel = document.getElementById("genres");
     sel.innerHTML = '<option value="">Tất cả thể loại</option>' +
       Array.from(genres).map(g=>`<option value="${g}">${g}</option>`).join('');
   }
-
   function renderMovies() {
     let search = document.getElementById("search").value.trim().toLowerCase();
     let genreSel = document.getElementById("genres").value;
     let filtered = movieData.filter(m=>{
       return (!genreSel||m.genre===genreSel) &&
-        (!search || m.title.toLowerCase().includes(search)||m.desc.toLowerCase().includes(search))
+        (!search || m.title.toLowerCase().includes(search)||m.desc.toLowerCase().includes(search));
     });
     let container = document.getElementById("movie-rows");
     container.innerHTML = `
@@ -140,20 +155,19 @@
       ${filtered.map(m=>movieCard(m)).join('')}
       </div>`;
   }
-
   function movieCard(m){
     return `
       <div class="movie-card" onclick="openPlayer('${m.id}'); event.stopPropagation();">
+        ${m.isNew?'<div class="badge-new">Mới</div>':''}
         <img class="movie-poster" src="${m.poster||'https://img.icons8.com/color/480/movie-projector.png'}" alt="${m.title}"/>
         <div class="movie-info">
           <div class="movie-title">${m.title}</div>
           <div class="movie-genre">${m.genre||'Khác'} | <span class="movie-year">${m.year||''}</span></div>
           ${m.rating ? `<div class="movie-rating">★ ${m.rating.toFixed(1)}/5</div>`:""}
-          <div class="movie-desc">${m.desc||''}</div>
+          <div class="movie-desc">${m.desc?m.desc.slice(0,64)+(m.desc.length>64?"...":""):""}</div>
         </div>
       </div>`;
   }
-
   function openPlayer(id) {
     currentMovie = movieData.find(m=>m.id===id);
     if (!currentMovie) return;
@@ -166,22 +180,32 @@
       ? `<iframe src="${embedUrl}" width="800" height="450" allow="autoplay" allowfullscreen style="border-radius:11px"></iframe>`
       : '<div>Không có video</div>';
     document.getElementById("movie-detail").innerHTML = `
-      <h2 class="movie-title">${currentMovie.title}</h2>
-      <div>Thể loại: <b>${currentMovie.genre||""}</b></div>
-      <div>Năm: ${currentMovie.year||""}</div>
-      <div>${currentMovie.desc||""}</div>
+      <h2 id="detail-title">${currentMovie.title}</h2>
+      <div>Thể loại: <b>${currentMovie.genre||""}</b> | Năm: ${currentMovie.year||""} | ${currentMovie.rating?`★ ${currentMovie.rating.toFixed(1)}/5`:"Chưa có điểm"}</div>
+      <div id="detail-desc">${currentMovie.desc||""}</div>
     `;
+    renderSuggestion(currentMovie);
+  }
+  function renderSuggestion(movie){
+    let suggest = movieData.filter(m=>m.genre===movie.genre && m.id!==movie.id);
+    document.getElementById("suggestion-title").innerText = suggest.length?"Phim liên quan:":"";
+    document.getElementById("suggest-row").innerHTML = suggest.map(m=>`
+      <div class="suggest-card" onclick="openPlayer('${m.id}'); event.stopPropagation();">
+        <img src="${m.poster||'https://img.icons8.com/color/480/movie-projector.png'}" />
+        <div class="s-title">${m.title}</div>
+      </div>`).join('');
   }
   function closePlayer() {
     document.getElementById("modal-player").style.display = "none";
     document.body.style.overflow="";
     document.getElementById("player").innerHTML="";
     document.getElementById("movie-detail").innerHTML="";
+    document.getElementById("suggestion-title").innerHTML = "";
+    document.getElementById("suggest-row").innerHTML = "";
     currentMovie = null;
   }
   document.getElementById("search").addEventListener("input", renderMovies);
   document.getElementById("genres").addEventListener("change", renderMovies);
-
   window.onload = async function(){
     await fetchMovies();
     renderGenres();
