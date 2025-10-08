@@ -5,6 +5,7 @@
   <title>Phim Online Streaming Pro (Drive/Sheet)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
+    /* --- Toàn bộ phần CSS như file trước, không đổi nên để ngắn lại --- */
     html, body { margin:0; padding:0; background: radial-gradient(ellipse at top left, #181818 0%, #232323 100%); min-height:100vh;}
     body { color: #fff; font-family: 'Segoe UI', Arial, sans-serif; overflow-x:hidden;}
     ::-webkit-scrollbar { width: 8px; background: #222;}
@@ -112,7 +113,7 @@
       <div id="comments"></div>
       <div id="add-comment">
         <h4>Bình luận & đánh giá</h4>
-        <form onsubmit="sendComment(event)">
+        <form id="comment-form">
           <input type="text" id="comment-author" placeholder="Tên của bạn" required style="width:28%;padding:7px;"/>
           <input type="number" id="comment-rating" min="1" max="5" placeholder="Điểm (1-5)" required style="width:15%;padding:7px;"/>
           <input type="text" id="comment-text" placeholder="Bình luận..." required style="width:42%;padding:7px;"/>
@@ -127,7 +128,6 @@
     &copy; 2025 Phim Online. <a href="https://github.com/" target="_blank">Github</a> • Powered by Google Drive & Sheet API. Developed by bạn!
   </footer>
   <script>
-  // CONFIG
   const SHEET_ID = '15mFrve7Z-_zi_7AvSq3t9Nti1VjINVHCQDF7LRmP1QQ'
   const API_KEY = 'AIzaSyD5dWLgYZPu1_-AkwAaHPClGOOQ-Lq5EGI'
   const SHEET_RANGE = 'Sheet1!A2:H'
@@ -135,7 +135,6 @@
   let movieData = []; let genres = new Set();
   let currentMovie = null; let commentsCache = {};
   let watchlist=[], history=[];
-  // ------ Watchlist --------
   function loadWatchlist(){watchlist = JSON.parse(localStorage.getItem('watchlist')||'[]');}
   function saveWatchlist(){localStorage.setItem('watchlist',JSON.stringify(watchlist));}
   function addWatch(id){ if(!watchlist.includes(id)){watchlist.unshift(id);} saveWatchlist(); renderWatchlist();}
@@ -144,20 +143,15 @@
     if(!watchlist.length){document.getElementById('watchlist-bar').innerHTML=""; return;}
     let html='<b>🎬 Yêu thích: </b>';
     watchlist.forEach(id=>{
-      let m=movieData.find(x=>x.id===id);
-      if(m) html+=`<span class="fav-chip" onclick="openPlayer('${m.id}')">${m.title}</span>`;
+      let m=movieData.find(x=>x.id===id); if(m) html+=`<span class="fav-chip" onclick="openPlayer('${m.id}')">${m.title}</span>`;
     });
     html+=`<span class="fav-chip" style="background:#a03333;" onclick="clearWatchlist()">Xóa tất cả</span>`;
     document.getElementById('watchlist-bar').innerHTML=html;
   }
   function clearWatchlist(){watchlist=[];saveWatchlist();renderWatchlist();}
-  // ------ Lịch sử đã xem -------
   function loadHistory(){history=JSON.parse(localStorage.getItem('history')||'[]');}
   function saveHistory(){localStorage.setItem('history',JSON.stringify(history));}
-  function addHistory(id){ 
-    history = history.filter(x=>x!==id); history.unshift(id); if(history.length>10) history.length=10;
-    saveHistory(); renderHistory();
-  }
+  function addHistory(id){ history = history.filter(x=>x!==id); history.unshift(id); if(history.length>10) history.length=10; saveHistory(); renderHistory();}
   function renderHistory(){
     if(!history.length){document.getElementById('history-bar').innerHTML="";return;}
     let html='<b>👀 Đã xem: </b>';
@@ -178,7 +172,6 @@
     }))
     genres = new Set(movieData.map(m=>m.genre))
   }
-  // --- Hiển thị phim theo hàng ---
   function renderMoviesByGenre() {
     let container = document.getElementById("movie-rows");
     container.innerHTML="";
@@ -263,7 +256,7 @@
   }
   function renderRatingForm(movie) {
     document.getElementById("rating-form").innerHTML = `
-      <form onsubmit="sendRating(event)">
+      <form id="rating-form-real">
         <label>Chấm điểm phim: </label>
         <select id="input-rating" required>
           <option value="">Chọn...</option>
@@ -275,33 +268,40 @@
         </select>
         <button type="submit">Gửi</button>
       </form>
-    `
+    `;
+    document.getElementById("rating-form-real").onsubmit = sendRating;
   }
   async function sendRating(event) {
-    event.preventDefault()
-    const rating = document.getElementById("input-rating").value
-    if (!rating || !currentMovie.id) return
-    await fetch(SCRIPT_ENDPOINT,{
-      method:"POST",
-      body: JSON.stringify({type:"rating",id:currentMovie.id,rating}),
-      headers:{ "Content-Type":"application/json" }
-    })
-    alert("Chấm điểm thành công!")
-    closePlayer(); await refreshAll();
+    event.preventDefault();
+    if (!currentMovie || !currentMovie.id) return;
+    const rating = document.getElementById("input-rating").value;
+    if (!rating) return;
+    try{
+      const res = await fetch(SCRIPT_ENDPOINT,{
+        method:"POST",
+        body: JSON.stringify({type:"rating",id:currentMovie.id,rating}),
+        headers:{ "Content-Type":"application/json" }
+      });
+      let data = await res.text();
+      alert("Chấm điểm thành công!");
+      closePlayer(); await refreshAll();
+    } catch(e){ alert('Lỗi gửi chấm điểm!'); }
   }
   async function loadComments(movie) {
-    const res = await fetch(`${SCRIPT_ENDPOINT}?type=comments&id=${movie.id}`)
-    const data = await res.json()
-    const comments = data.comments || []
-    commentsCache[movie.id] = comments
-    document.getElementById("comments").innerHTML = "<h4>Bình luận:</h4>" +
-      (comments.length?
-      comments.map(c=>`
-        <div class="comment">
-          <div class="comment-author">${c.author||'Ẩn danh'} ${c.rating?`★ ${c.rating}/5`:""}</div>
-          <div class="comment-text">${c.text}</div>
-        </div>
-      `).join(''): '<i>Chưa có bình luận nào.</i>')
+    try {
+      const res = await fetch(`${SCRIPT_ENDPOINT}?type=comments&id=${movie.id}`);
+      const data = await res.json();
+      const comments = data.comments || [];
+      commentsCache[movie.id] = comments;
+      document.getElementById("comments").innerHTML = "<h4>Bình luận:</h4>" +
+        (comments.length ?
+        comments.map(c=>`
+          <div class="comment">
+            <div class="comment-author">${c.author||'Ẩn danh'} ${c.rating?`★ ${c.rating}/5`:""}</div>
+            <div class="comment-text">${c.text}</div>
+          </div>
+        `).join(''): '<i>Chưa có bình luận nào.</i>');
+    } catch(e){ document.getElementById("comments").innerHTML="<i>Lỗi tải bình luận!</i>"; }
   }
   async function sendComment(event) {
     event.preventDefault()
@@ -310,16 +310,19 @@
     const text = document.getElementById("comment-text").value
     const rating = document.getElementById("comment-rating").value
     if(!author||!text||!rating) return
-    await fetch(SCRIPT_ENDPOINT,{
-      method:"POST",
-      body: JSON.stringify({type:"comment",id:currentMovie.id,author,text,rating}),
-      headers:{"Content-Type":"application/json"}
-    })
-    alert("Bình luận đã gửi!")
-    document.getElementById("comment-author").value=""
-    document.getElementById("comment-text").value=""
-    document.getElementById("comment-rating").value=""
-    await loadComments(currentMovie)
+    try {
+      const res = await fetch(SCRIPT_ENDPOINT,{
+        method:"POST",
+        body: JSON.stringify({type:"comment",id:currentMovie.id,author,text,rating}),
+        headers:{"Content-Type":"application/json"}
+      });
+      let data = await res.text();
+      alert("Bình luận đã gửi!");
+      document.getElementById("comment-author").value=""
+      document.getElementById("comment-text").value=""
+      document.getElementById("comment-rating").value=""
+      await loadComments(currentMovie)
+    } catch(e){ alert('Lỗi gửi bình luận!'); }
   }
   function renderSuggestion(movie){
     let suggest = movieData.filter(m=>m.genre===movie.genre && m.id!==movie.id)
@@ -355,6 +358,7 @@
   }
   document.getElementById("search").addEventListener("input", renderMoviesByGenre);
   document.getElementById("genres").addEventListener("change", renderMoviesByGenre);
+  document.getElementById("comment-form").onsubmit = sendComment;
   window.onload = refreshAll;
   </script>
 </body>
