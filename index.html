@@ -5,7 +5,6 @@
   <title>Phim Online Streaming Pro (Drive/Sheet)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
-    /* --- Toàn bộ phần CSS như file trước, không đổi nên để ngắn lại --- */
     html, body { margin:0; padding:0; background: radial-gradient(ellipse at top left, #181818 0%, #232323 100%); min-height:100vh;}
     body { color: #fff; font-family: 'Segoe UI', Arial, sans-serif; overflow-x:hidden;}
     ::-webkit-scrollbar { width: 8px; background: #222;}
@@ -131,7 +130,7 @@
   const SHEET_ID = '15mFrve7Z-_zi_7AvSq3t9Nti1VjINVHCQDF7LRmP1QQ'
   const API_KEY = 'AIzaSyD5dWLgYZPu1_-AkwAaHPClGOOQ-Lq5EGI'
   const SHEET_RANGE = 'Sheet1!A2:H'
-  const SCRIPT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyY2T1jLpMMXXNMxsUzgQslU6B6OX2TGWxJIwYNZna0g98bZYRqAEsGDvl3nQsHstnG/exec'
+  const SCRIPT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbysq32epfb89btNoWGSxn-eEXMqeToCJQprpWkmNn_mIlyO9hfG1Kr8rHFjq47YX1eU/exec'
   let movieData = []; let genres = new Set();
   let currentMovie = null; let commentsCache = {};
   let watchlist=[], history=[];
@@ -143,9 +142,9 @@
     if(!watchlist.length){document.getElementById('watchlist-bar').innerHTML=""; return;}
     let html='<b>🎬 Yêu thích: </b>';
     watchlist.forEach(id=>{
-      let m=movieData.find(x=>x.id===id); if(m) html+=`<span class="fav-chip" onclick="openPlayer('${m.id}')">${m.title}</span>`;
+      let m=movieData.find(x=>x.id===id); if(m) html+=`<span class="fav-chip" onclick="openPlayer('${m.id}'); event.stopPropagation();">${m.title}</span>`;
     });
-    html+=`<span class="fav-chip" style="background:#a03333;" onclick="clearWatchlist()">Xóa tất cả</span>`;
+    html+=`<span class="fav-chip" style="background:#a03333;" onclick="clearWatchlist(); event.stopPropagation();">Xóa tất cả</span>`;
     document.getElementById('watchlist-bar').innerHTML=html;
   }
   function clearWatchlist(){watchlist=[];saveWatchlist();renderWatchlist();}
@@ -157,9 +156,9 @@
     let html='<b>👀 Đã xem: </b>';
     history.forEach(id=>{
       let m=movieData.find(x=>x.id===id);
-      if(m) html+=`<span class="history-chip" onclick="openPlayer('${m.id}')">${m.title}</span>`;
+      if(m) html+=`<span class="history-chip" onclick="openPlayer('${m.id}'); event.stopPropagation();">${m.title}</span>`;
     });
-    html+=`<span class="history-chip" style="background:#2c0909;" onclick="clearHistory()">Xóa tất cả</span>`;
+    html+=`<span class="history-chip" style="background:#2c0909;" onclick="clearHistory(); event.stopPropagation();">Xóa tất cả</span>`;
     document.getElementById('history-bar').innerHTML=html;
   }
   function clearHistory(){history=[];saveHistory();renderHistory();}
@@ -170,7 +169,7 @@
     movieData = (data.values||[]).map(row=>({
       title:row[0]||"",desc:row[1]||"",genre:row[2]||"",drive:row[3]||"",poster:row[4]||"",year:row[5]||"",rating:parseFloat(row[6]||'0'),id:row[7]||""
     }))
-    genres = new Set(movieData.map(m=>m.genre))
+    genres = new Set(movieData.map(m=>m.genre));
   }
   function renderMoviesByGenre() {
     let container = document.getElementById("movie-rows");
@@ -196,8 +195,8 @@
       container.innerHTML+=`
         <div class="row-title">${g}</div>
         <div class="movie-row" id="row-${g.replace(/\s+/g,'_')}">${rows[g].map(m=>movieCard(m)).join('')}
-          <button class="carousel-arrow left" onclick="scrollRow('${g.replace(/\s+/g,'_')}',-1)">&#8592;</button>
-          <button class="carousel-arrow right" onclick="scrollRow('${g.replace(/\s+/g,'_')}',1)">&#8594;</button>
+          <button class="carousel-arrow left" onclick="scrollRow('${g.replace(/\s+/g,'_')}',-1); event.stopPropagation();">&#8592;</button>
+          <button class="carousel-arrow right" onclick="scrollRow('${g.replace(/\s+/g,'_')}',1); event.stopPropagation();">&#8594;</button>
         </div>
       `;
     });
@@ -206,8 +205,8 @@
     let isWatch=watchlist.includes(m.id);
     let isHist=history.includes(m.id);
     return `
-      <div class="movie-card" onclick="openPlayer('${m.id}')">
-        <button class="fav-btn${isWatch?' fav':''}" title="Yêu thích/phim hot" onclick="event.stopPropagation();toggleWatch('${m.id}')">${isWatch?'★':'☆'}</button>
+      <div class="movie-card" onclick="openPlayer('${m.id}'); event.stopPropagation();">
+        <button class="fav-btn${isWatch?' fav':''}" title="Yêu thích/phim hot" onclick="event.stopPropagation();toggleWatch('${m.id}');">${isWatch?'★':'☆'}</button>
         ${isHist?'<div class="movie-badge">Đã xem</div>':""}
         <img class="movie-poster" src="${m.poster||'https://img.icons8.com/color/480/movie-projector.png'}" alt="${m.title}"/>
         <div class="movie-info">
@@ -228,34 +227,32 @@
     let e=document.getElementById('row-'+rowId);
     if(e){e.scrollBy({left:dir*320,behavior:'smooth'});}
   }
+  // ------- FIX CHUYỂN VIDEO --------
   function openPlayer(id) {
-  // Reset toàn bộ modal để tránh lưu trạng thái cũ
-  document.getElementById("player").innerHTML = "";
-  document.getElementById("movie-detail").innerHTML = "";
-  document.getElementById("comments").innerHTML = "";
-  document.getElementById("rating-form").innerHTML = "";
-  document.getElementById("suggestion-title").innerHTML = "";
-  document.getElementById("suggest-row").innerHTML = "";
-
-  // Đặt phim mới
-  currentMovie = movieData.find(m=>m.id===id)
-  if(!currentMovie) return
-  addHistory(currentMovie.id);
-  document.body.style.overflow="hidden"
-  document.getElementById("modal-player").style.display="flex"
-  // Google Drive preview
-  const fileId = currentMovie.drive.match(/[-\w]{25,}/)
-  const embedUrl = fileId ? `https://drive.google.com/file/d/${fileId}/preview`:""
-  // Gắn lại iframe mới (giúp xem video khác không bị bug)
-  document.getElementById("player").innerHTML = embedUrl ?
-    `<iframe src="${embedUrl}" width="800" height="450" allow="autoplay" allowfullscreen style="border-radius:11px"></iframe>`:
-    '<div>Không có video</div>'
-  
-  renderDetail(currentMovie);
-  renderRatingForm(currentMovie);
-  loadComments(currentMovie);
-  renderSuggestion(currentMovie);
-}
+    // Reset modal hoàn toàn
+    document.getElementById("player").innerHTML = "";
+    document.getElementById("movie-detail").innerHTML = "";
+    document.getElementById("comments").innerHTML = "";
+    document.getElementById("rating-form").innerHTML = "";
+    document.getElementById("suggestion-title").innerHTML = "";
+    document.getElementById("suggest-row").innerHTML = "";
+    // Đặt phim mới
+    currentMovie = movieData.find(m => m.id === id);
+    if (!currentMovie) return;
+    addHistory(currentMovie.id);
+    document.body.style.overflow = "hidden";
+    document.getElementById("modal-player").style.display = "flex";
+    // Gắn lại iframe player.
+    const fileId = currentMovie.drive && currentMovie.drive.match(/[-\w]{25,}/);
+    const embedUrl = fileId ? `https://drive.google.com/file/d/${fileId}/preview` : "";
+    document.getElementById("player").innerHTML = embedUrl
+      ? `<iframe src="${embedUrl}" width="800" height="450" allow="autoplay" allowfullscreen style="border-radius:11px"></iframe>`
+      : "<div>Không có video</div>";
+    renderDetail(currentMovie);
+    renderRatingForm(currentMovie);
+    loadComments(currentMovie);
+    renderSuggestion(currentMovie);
+  }
   function renderDetail(movie) {
     document.getElementById("movie-detail").innerHTML = `
       <img id="detail-poster" src="${movie.poster||''}" alt="${movie.title}"/>
@@ -264,7 +261,7 @@
       <div id="detail-year">Năm: ${movie.year||''}</div>
       <div id="detail-rating">★ ${movie.rating?movie.rating.toFixed(1):'Chưa có'}/5</div>
       <div id="detail-desc">${movie.desc||''}</div>
-    `
+    `;
   }
   function renderRatingForm(movie) {
     document.getElementById("rating-form").innerHTML = `
@@ -340,7 +337,7 @@
     let suggest = movieData.filter(m=>m.genre===movie.genre && m.id!==movie.id)
     document.getElementById("suggestion-title").innerText = suggest.length?"Phim liên quan:":"";
     document.getElementById("suggest-row").innerHTML = suggest.map(m=>`
-      <div class="suggest-card" onclick="openPlayer('${m.id}')">
+      <div class="suggest-card" onclick="openPlayer('${m.id}'); event.stopPropagation();">
         <img src="${m.poster||'https://img.icons8.com/color/480/movie-projector.png'}" />
         <div class="s-title">${m.title}</div>
       </div>`).join('');
