@@ -2,21 +2,22 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
-  <title>Phim Online | Giao diện sáng, chữ trắng rõ nét</title>
+  <title>MovieHub - Trang xem phim online miễn phí</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="MovieHub - Trang phim trực tuyến: Xem phim lẻ, phim bộ, hoạt hình, TV show, anime chất lượng cao, giao diện đẹp, chia sẻ link dễ dàng, trải nghiệm mượt trên mọi thiết bị!"/>
   <style>
     body {background:#181818;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;color:#fff;}
     html,body{min-height:100vh;}
     ::-webkit-scrollbar { width: 8px; background: #232323;}
     ::-webkit-scrollbar-thumb { background: #e50914; border-radius:5px;}
-    header {position:sticky;top:0;z-index:3000;background:rgba(32,32,32,0.98);padding:13px 18px 13px 24px;display:flex;gap:17px;align-items:center;box-shadow:0 2px 14px #1114;}
+    header {position:sticky;top:0;z-index:3000;background:rgba(32,32,32,0.99);padding:13px 18px 13px 24px;display:flex;gap:17px;align-items:center;box-shadow:0 2px 14px #1114;}
     header h1 {margin:0;font-size:2.15em;color:#e50914;font-weight:700;letter-spacing:.5px; text-shadow:0 2px 12px #000c;}
     #search,#genres{padding:8px 17px;font-size:1em;border-radius:7px;border:none;background:#232323;color:#fff;}
     #search:focus,#genres:focus{box-shadow:0 2px 9px #e5091442;}
-    .hero{width:100vw;min-height:220px;max-height:35vw;background:#1c1c1c url('https://images.unsplash.com/photo-1465101162946-4377e57745c3?auto=format&fit=crop&w=900&q=60') no-repeat center/cover;position:relative;box-shadow:0 15px 60px #0008 inset;}
-    .hero-info{position:absolute;bottom:20px;left:52px;max-width:42vw;color:#fff;text-shadow:0 3px 15px #000b;}
+    .hero{width:100vw;min-height:220px;max-height:35vw;background:#232323 url('https://images.unsplash.com/photo-1465101162946-4377e57745c3?auto=format&fit=crop&w=900&q=60') no-repeat center/cover;position:relative;box-shadow:0 15px 60px #0008 inset;}
+    .hero-info{position:absolute;bottom:20px;left:52px;max-width:44vw;color:#fff;text-shadow:0 3px 15px #000b;}
     .hero-title{font-size:2.2em;font-weight:bold;margin:0 0 7px 0;color:#fff;}
-    .hero-desc{font-size:1.14em;opacity:.95;margin:0 0 10px 0;color:#e2e2e2;}
+    .hero-desc{font-size:1.14em;opacity:.97;margin:0 0 10px 0;color:#e2e2e2;}
     .hero-btn{padding:11px 28px;font-size:1.12em;font-weight:bold;background:#e50914;color:#fff;border:none;border-radius:40px;margin-top:7px;cursor:pointer;transition:.15s;}
     .hero-btn:hover{background:#bf0e19;}
     .row-title{font-size:1.11em;color:#ffef79;margin:32px 30px 10px 24px;font-weight:700;letter-spacing:.5px;}
@@ -30,16 +31,18 @@
     .movie-rating{color:#fadb3a;font-weight:bold; font-size:1.04em;}
     .movie-desc{color:#e2e2e2;font-size:.95em;}
     .badge-new {background:#e50914;color:#fff;position:absolute;top:7px;left:7px;padding:2px 13px;border-radius:8px;font-size:.93em;}
-    #modal-player{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(12,12,16,0.95);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;z-index:5000;overflow-x:auto;}
-    #modal-content{background:#222; border-radius:21px; padding:30px 12px 20px 12px; max-width:96vw;width:97vw; box-shadow:0 17px 49px #000a;position:relative;color:#fff;}
+    #modal-player{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(12,12,16,0.96);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;z-index:5000;overflow-x:auto;}
+    #modal-content{background:#222; border-radius:21px; padding:29px 12px 18px 12px; max-width:96vw;width:97vw; box-shadow:0 17px 49px #000a;position:relative;color:#fff;}
     #player{text-align:center;margin-bottom:17px;}
-    #player iframe{width:100%;max-width:98vw;height:50vw;max-height:350px;min-height:170px;border-radius:13px;box-shadow:0 1.5px 13px #e5091440;}
+    #player iframe{width:100%;max-width:98vw;height:49vw;max-height:350px;min-height:170px;border-radius:13px;box-shadow:0 1.5px 13px #e5091440;}
     #close-btn{background:#e50914;color:#fff;border:none;border-radius:9px;padding:10px 13px;font-size:1em;cursor:pointer;font-weight:600;position:absolute;right:13px;top:13px;}
     #close-btn:hover{background:#bd070a;}
-    #detail-title{font-size:1.24em;font-weight:700;margin:7px 0 7px 0;color:#ffe27a;text-shadow:0 2px 7px #111b;}
+    #detail-title{font-size:1.22em;font-weight:700;margin:7px 0 7px 0;color:#ffe27a;text-shadow:0 2px 7px #111b;}
     #movie-detail, #detail-desc, #movie-detail *{color:#fff !important;}
-    #detail-desc{font-size:1em;color:#e0e0e0!important;margin:5px 0;}
-    #suggestion-title{font-size:1.07em;margin:14px 0 8px 0;color:#ffef79;}
+    #detail-desc{font-size:1em;color:#e0e0e0!important;margin:7px 0;}
+    .share-btn{float:right;margin-top:-5px;padding:7px 16px;background:#ffe066;color:#111;font-size:.97em;font-weight:bold;border:none;border-radius:13px;cursor:pointer;}
+    .share-btn:hover{background:#edb800;}
+    #suggestion-title{font-size:1.07em;margin:12px 0 7px 0;color:#ffef79;}
     .suggest-row{display:flex;gap:14px;overflow-x:auto;}
     .suggest-card{width:88px;min-width:88px;border-radius:8px;overflow:hidden;background:#252527;box-shadow:0 1px 7px #0003;cursor:pointer;transition:transform .11s;}
     .suggest-card img{width:100%;aspect-ratio:2/3;object-fit:cover;}
@@ -53,14 +56,14 @@
 </head>
 <body>
   <header>
-    <h1>PHIM ONLINE</h1>
+    <h1>MovieHub</h1>
     <input type="search" id="search" placeholder="Tìm kiếm phim..."/>
     <select id="genres"><option value="">Tất cả thể loại</option></select>
   </header>
   <section class="hero">
     <div class="hero-info" id="hero-info">
-      <div class="hero-title">Khám phá kho phim mới nhất 2025</div>
-      <div class="hero-desc">Xem phim lẻ, phim bộ, hoạt hình, TV show cực nét miễn phí. Giao diện Việt hóa, lấy cảm hứng từ FPT Play, K+.</div>
+      <div class="hero-title">MovieHub - Xem phim Online miễn phí</div>
+      <div class="hero-desc">Phim lẻ, phim bộ, hoạt hình, TV show, anime chất lượng cao. Giao diện hiện đại. Chia sẻ link từng phim dễ dàng, tự động nhận diện khi xem.</div>
       <button class="hero-btn" onclick="scrollToMain()">Xem ngay</button>
     </div>
   </section>
@@ -75,7 +78,7 @@
     </div>
   </div>
   <footer>
-    &copy; 2025 Phim Việt | Giao diện sáng, chữ nổi rõ ràng | Powered by Google Sheets/Drive 
+    &copy; 2025 MovieHub. Trang web xem phim trực tuyến miễn phí, chia sẻ link nhanh. Powered by Google Sheets/Drive.
   </footer>
   <script>
   const SHEET_ID = '15mFrve7Z-_zi_7AvSq3t9Nti1VjINVHCQDF7LRmP1QQ';
@@ -156,17 +159,28 @@
     if (!currentMovie) return;
     document.body.style.overflow="hidden";
     document.getElementById("modal-player").style.display = "flex";
+    // Chuyển link khi mở modal
+    location.hash = "id=" + encodeURIComponent(currentMovie.id);
+    // Player responsive
     const fileId = currentMovie.drive && currentMovie.drive.match(/[-\w]{25,}/);
     const embedUrl = fileId ? `https://drive.google.com/file/d/${fileId}/preview` : "";
     document.getElementById("player").innerHTML = embedUrl
       ? `<iframe src="${embedUrl}" allow="autoplay" allowfullscreen style="width:100%;min-height:180px;max-width:99vw;height:43vw;max-height:320px;border-radius:13px;"></iframe>`
       : '<div>Không có video</div>';
+    let baseUrl = window.location.origin + window.location.pathname;
     document.getElementById("movie-detail").innerHTML = `
       <h2 id="detail-title">${currentMovie.title}</h2>
+      <button class="share-btn" onclick="copyMovieLink()">Chia sẻ</button>
       <div><b style="color:#ffe27a;">Thể loại:</b> ${currentMovie.genre||""} | <b style="color:#ffe27a;">Năm:</b> ${currentMovie.year||""} | ${currentMovie.rating?`<span style="color:#ffd400;">★ ${currentMovie.rating.toFixed(1)}/5</span>`:"Chưa có điểm"}</div>
       <div id="detail-desc">${currentMovie.desc||""}</div>
     `;
     renderSuggestion(currentMovie);
+  }
+  // Hàm copy link phim hiện tại
+  function copyMovieLink() {
+    let link = window.location.origin + window.location.pathname + location.hash;
+    navigator.clipboard.writeText(link);
+    alert("Đã copy link phim: " + link);
   }
   function renderSuggestion(movie){
     let suggest = movieData.filter(m=>m.genre===movie.genre && m.id!==movie.id);
@@ -185,16 +199,37 @@
     document.getElementById("suggestion-title").innerHTML = "";
     document.getElementById("suggest-row").innerHTML = "";
     currentMovie = null;
+    history.replaceState(null, null, window.location.pathname);
   }
   function scrollToMain() {
     document.getElementById('movie-rows').scrollIntoView({behavior:'smooth'});
   }
+  // Khi truy cập có #id=, tự động mở modal phim tương ứng (SPA like)
+  window.addEventListener("load", ()=> {
+    if (location.hash.startsWith("#id=")) {
+      let id = decodeURIComponent(location.hash.slice(4));
+      setTimeout(()=>openPlayer(id),300);
+    }
+  });
+  window.addEventListener("hashchange", ()=>{
+    if (location.hash.startsWith("#id=")) {
+      let id = decodeURIComponent(location.hash.slice(4));
+      openPlayer(id);
+    } else {
+      closePlayer();
+    }
+  });
+
   document.getElementById("search").addEventListener("input", renderMovies);
   document.getElementById("genres").addEventListener("change", renderMovies);
   window.onload = async function(){
     await fetchMovies();
     renderGenres();
     renderMovies();
+    if (location.hash.startsWith("#id=")) {
+      let id = decodeURIComponent(location.hash.slice(4));
+      openPlayer(id);
+    }
   }
   </script>
 </body>
