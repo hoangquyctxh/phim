@@ -129,7 +129,152 @@
   <script>
   const SHEET_ID = '15mFrve7Z-_zi_7AvSq3t9Nti1VjINVHCQDF7LRmP1QQ'
   const API_KEY = 'AIzaSyD5dWLgYZPu1_-AkwAaHPClGOOQ-Lq5EGI'
-  const SHEET_RANGE = 'Sheet1!A1:K'   // LẤY CẢ HÀNG TIÊU ĐỀ VÀ TOÀN BỘ SHEET
-  const SCRIPT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbysq32epfb89btNoWGSxn-eEXMqeToCJQprpWkmNn_mIlyO9hfG1Đây là bản **index.html tổng hợp** đã sửa dứt điểm lỗi chỉ hiện mỗi phim ở hàng 2 —  
-**file đọc header sheet tự động và hiển thị mọi dòng có dữ liệu phim**:
-
+  const SHEET_RANGE = 'Sheet1!A1:K'
+  const SCRIPT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbysq32epfb89btNoWGSxn-eEXMqeToCJQprpWkmNn_mIlyO9hfG1Kr8rHFjq47YX1eU/exec'
+  let movieData = []; let genres = new Set();
+  let currentMovie = null; let commentsCache = {};
+  let watchlist=[], history=[];
+  function loadWatchlist(){watchlist = JSON.parse(localStorage.getItem('watchlist')||'[]');}
+  function saveWatchlist(){localStorage.setItem('watchlist',JSON.stringify(watchlist));}
+  function addWatch(id){ if(!watchlist.includes(id)){watchlist.unshift(id);} saveWatchlist(); renderWatchlist();}
+  function removeWatch(id){watchlist=watchlist.filter(x=>x!==id); saveWatchlist();renderWatchlist();}
+  function renderWatchlist(){
+    if(!watchlist.length){document.getElementById('watchlist-bar').innerHTML=""; return;}
+    let html='<b>🎬 Yêu thích: </b>';
+    watchlist.forEach(id=>{
+      let m=movieData.find(x=>x.id===id); if(m) html+=`<span class="fav-chip" onclick="openPlayer('${m.id}'); event.stopPropagation();">${m.title}</span>`;
+    });
+    html+=`<span class="fav-chip" style="background:#a03333;" onclick="clearWatchlist(); event.stopPropagation();">Xóa tất cả</span>`;
+    document.getElementById('watchlist-bar').innerHTML=html;
+  }
+  function clearWatchlist(){watchlist=[];saveWatchlist();renderWatchlist();}
+  function loadHistory(){history=JSON.parse(localStorage.getItem('history')||'[]');}
+  function saveHistory(){localStorage.setItem('history',JSON.stringify(history));}
+  function addHistory(id){ history = history.filter(x=>x!==id); history.unshift(id); if(history.length>10) history.length=10; saveHistory(); renderHistory();}
+  function renderHistory(){
+    if(!history.length){document.getElementById('history-bar').innerHTML="";return;}
+    let html='<b>👀 Đã xem: </b>';
+    history.forEach(id=>{
+      let m=movieData.find(x=>x.id===id);
+      if(m) html+=`<span class="history-chip" onclick="openPlayer('${m.id}'); event.stopPropagation();">${m.title}</span>`;
+    });
+    html+=`<span class="history-chip" style="background:#2c0909;" onclick="clearHistory(); event.stopPropagation();">Xóa tất cả</span>`;
+    document.getElementById('history-bar').innerHTML=html;
+  }
+  function clearHistory(){history=[];saveHistory();renderHistory();}
+  // --- SỬA fetchMovies: lấy đúng các dòng, tránh lỗi chỉ hiện 1 phim ---
+  async function fetchMovies() {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_RANGE}?key=${API_KEY}`
+    const res = await fetch(url)
+    const data = await res.json()
+    const rows = data.values || [];
+    if (!rows.length) return movieData = [];
+    const header = rows[0].map(h => h.trim().toLowerCase());
+    const idxTitle  = header.findIndex(x=>x.includes("tên"));
+    const idxDesc   = header.findIndex(x=>x.includes("mô tả"));
+    const idxGenre  = header.findIndex(x=>x.includes("loại"));
+    const idxDrive  = header.findIndex(x=>x.includes("drive"));
+    const idxPoster = header.findIndex(x=>x.includes("poster"));
+    const idxYear   = header.findIndex(x=>x.includes("năm"));
+    const idxRating = header.findIndex(x=>x.includes("điểm"));
+    const idxID     = header.findIndex(x=>x==="id");
+    movieData = rows.slice(1).map(row => ({
+      title:  row[idxTitle]  || "",
+      desc:   row[idxDesc]   || "",
+      genre:  row[idxGenre]  || "",
+      drive:  row[idxDrive]  || "",
+      poster: row[idxPoster] || "",
+      year:   row[idxYear]   || "",
+      rating: parseFloat(row[idxRating]||"0"),
+      id:     row[idxID]     || ""
+    })).filter(m => m.title && m.id);
+    genres = new Set(movieData.map(m=>m.genre));
+  }
+  // --- Giữ nguyên toàn bộ các hàm renderMovies, openPlayer ... ---
+  function renderMoviesByGenre() {
+    let container = document.getElementById("movie-rows");
+    container.innerHTML="";
+    let gList=[...genres].filter(g=>g).sort();
+    let rows = {};
+    gList.forEach(g=>rows[g]=movieData.filter(m=>m.genre===g));
+    let search = document.getElementById("search").value.trim().toLowerCase();
+    let genreSel = document.getElementById("genres").value;
+    let filtered = movieData.filter(m=>{
+      return (!genreSel||m.genre===genreSel) &&
+        (!search || m.title.toLowerCase().includes(search)||m.desc.toLowerCase().includes(search))
+    });
+    if(search||genreSel){
+      container.innerHTML=`
+        <div class="row-title">Kết quả tìm kiếm</div>
+        <div class="movie-row">${filtered.map(m=>movieCard(m)).join('')}</div>
+      `;
+      return;
+    }
+    gList.forEach(g=>{
+      if(rows[g]?.length)
+      container.innerHTML+=`
+        <div class="row-title">${g}</div>
+        <div class="movie-row" id="row-${g.replace(/\s+/g,'_')}">${rows[g].map(m=>movieCard(m)).join('')}
+          <button class="carousel-arrow left" onclick="scrollRow('${g.replace(/\s+/g,'_')}',-1); event.stopPropagation();">&#8592;</button>
+          <button class="carousel-arrow right" onclick="scrollRow('${g.replace(/\s+/g,'_')}',1); event.stopPropagation();">&#8594;</button>
+        </div>
+      `;
+    });
+  }
+  function movieCard(m){
+    let isWatch=watchlist.includes(m.id);
+    let isHist=history.includes(m.id);
+    return `
+      <div class="movie-card" onclick="openPlayer('${m.id}'); event.stopPropagation();">
+        <button class="fav-btn${isWatch?' fav':''}" title="Yêu thích/phim hot" onclick="event.stopPropagation();toggleWatch('${m.id}');">${isWatch?'★':'☆'}</button>
+        ${isHist?'<div class="movie-badge">Đã xem</div>':""}
+        <img class="movie-poster" src="${m.poster||'https://img.icons8.com/color/480/movie-projector.png'}" alt="${m.title}"/>
+        <div class="movie-info">
+          <div class="movie-title">${m.title}</div>
+          <div class="movie-genre">${m.genre||'Khác'} | <span class="movie-year">${m.year||''}</span></div>
+          ${m.rating ? `<div class="movie-rating">★ ${m.rating.toFixed(1)}/5</div>`:""}
+          <div class="movie-desc">${m.desc||''}</div>
+        </div>
+      </div>
+    `;
+  }
+  window.toggleWatch = function(id){
+    if(watchlist.includes(id)) removeWatch(id);
+    else addWatch(id);
+    renderMoviesByGenre();
+  }
+  window.scrollRow = function(rowId, dir){
+    let e=document.getElementById('row-'+rowId);
+    if(e){e.scrollBy({left:dir*320,behavior:'smooth'});}
+  }
+  function openPlayer(id) {
+    document.getElementById("player").innerHTML = "";
+    document.getElementById("movie-detail").innerHTML = "";
+    document.getElementById("comments").innerHTML = "";
+    document.getElementById("rating-form").innerHTML = "";
+    document.getElementById("suggestion-title").innerHTML = "";
+    document.getElementById("suggest-row").innerHTML =```
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Phim Online Streaming Pro (Drive/Sheet)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    /* ... CSS giữ nguyên như các bản hoàn chỉnh ở trên ... */
+    html, body { margin:0; padding:0; background: radial-gradient(ellipse at top left, #181818 0%, #232323 100%); min-height:100vh;}
+    body { color: #fff; font-family: 'Segoe UI', Arial, sans-serif; overflow-x:hidden;}
+    ::-webkit-scrollbar { width: 8px; background: #222;}
+    ::-webkit-scrollbar-thumb { background: #e50914; border-radius:5px;}
+    header {position:sticky; top:0; z-index:1000; background:rgba(30,30,30,0.98); backdrop-filter:blur(2px); padding:14px 18px; 
+      display:flex; flex-direction:row; align-items:center; gap:12px; box-shadow:0 3px 18px #0002;}
+    header h1 { margin:0; font-size:2em; color:#e50914; font-weight:700; letter-spacing:.5px; transition:.2s;}
+    #search, #genres { padding:8px 13px; background:#232323; color:#fff; border:1px solid #292929; border-radius:7px; margin:0 4px;
+      font-size:1em; box-shadow:0 2px 7px #0002;}
+    #search:focus, #genres:focus {border:1px solid #e50914;}
+    main {margin-bottom:40px;}
+    .row-title {font-size:1.15em; color: #ffe27a; margin:17px 30px 7px 17px; font-weight:600; letter-spacing:.5px;}
+    .movie-row {display:flex; flex-direction:row; overflow-x:auto; padding:7px 4vw 14px 2vw; scroll-behavior:smooth;}
+    .movie-row::-webkit-scrollbar{height:5px;}
+    .movie-row::-webkit-scrollbar-thumb{background:#e50914;}
+    .carousel-arrow {background:#212121cc; border:none; color:#fff; font-size:1
