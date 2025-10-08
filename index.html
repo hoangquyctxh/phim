@@ -7,7 +7,6 @@
   <style>
     html, body { margin:0; padding:0; background: radial-gradient(ellipse at top left, #181818 0%, #232323 100%); min-height:100vh;}
     body { color: #fff; font-family: 'Segoe UI', Arial, sans-serif; overflow-x:hidden;}
-    /* Custom scrollbar */
     ::-webkit-scrollbar { width: 8px; background: #222;}
     ::-webkit-scrollbar-thumb { background: #e50914; border-radius:5px;}
     header {position:sticky; top:0; z-index:1000; background:rgba(30,30,30,0.98); backdrop-filter:blur(2px); padding:14px 18px; 
@@ -18,19 +17,14 @@
     #search:focus, #genres:focus {border:1px solid #e50914;}
     main {margin-bottom:40px;}
     .row-title {font-size:1.15em; color: #ffe27a; margin:17px 30px 7px 17px; font-weight:600; letter-spacing:.5px;}
-
-    /* Movie row/slider */
     .movie-row {display:flex; flex-direction:row; overflow-x:auto; padding:7px 4vw 14px 2vw; scroll-behavior:smooth;}
     .movie-row::-webkit-scrollbar{height:5px;}
     .movie-row::-webkit-scrollbar-thumb{background:#e50914;}
-    /* Carousel arrow */
     .carousel-arrow {background:#212121cc; border:none; color:#fff; font-size:1.9em; border-radius:14px; position:absolute; top:36%; width:35px; height:68px; z-index:5;
       box-shadow:0 1px 9px #1117; cursor:pointer; opacity:.38; transition:.19s;}
     .carousel-arrow:hover{background:#e50914b0; opacity:.92;}
     .carousel-arrow.left {left:3vw;}
     .carousel-arrow.right{right:3vw;}
-
-    /* Movie card */
     .movie-card { width:170px; min-width:170px; background:#232323b8; border-radius:15px; overflow:hidden; margin:0 10px; margin-bottom:18px;
       box-shadow:0 8px 23px #0004; cursor:pointer; position:relative; transition:transform .21s, box-shadow .18s;
       display:flex; flex-direction:column;}
@@ -45,8 +39,6 @@
     .movie-genre, .movie-year, .movie-rating { font-size:0.93em; opacity:.8;}
     .movie-rating { color:#ffe27a; font-weight:bold;}
     .movie-badge {position:absolute; left:0;top:0;background:#e50914; color:#fff; font-size:.91em; font-weight:600; border-radius:0 11px 11px 0; padding:2px 10px;}
-
-    /* Modal overlay */
     #modal-player {
       position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(16,16,19,0.92);backdrop-filter:blur(7px); 
       display:none; align-items:center; justify-content:center; z-index:10000; animation:fadeinModal .33s; overflow-y:auto;
@@ -65,8 +57,6 @@
       box-shadow:0 1px 7px #e5091422;z-index:10;
     }
     #close-btn:hover {background:#b0060f;}
-
-    /* Chi tiết phim */
     #movie-detail { color:#fff; margin-bottom:13px;}
     #detail-title { font-size:1.33em; font-weight:700; color:#ffe27a; margin:0;}
     #detail-genre,#detail-year,#detail-rating{display:inline-block;margin-right:14px;}
@@ -78,14 +68,12 @@
     .comment-author { font-size:.94em; font-weight:bold;}
     .comment-text { margin-top:3px;}
     #add-comment h4 {margin-top:15px;}
-    /* Suggestions - phim liên quan */
     #suggestion-title{font-weight:500;margin:19px 0 7px 0;font-size:1.05em;}
     .suggest-row{display:flex;gap:19px;overflow-x:auto;}
     .suggest-card{width:102px;min-width:102px;border-radius:7px;overflow:hidden;background:#2c2c2c; box-shadow:0 2px 10px #0003;cursor:pointer;transition:transform .18s;}
     .suggest-card img{width:100%;aspect-ratio:2/3;object-fit:cover;}
     .suggest-card:hover{transform:scale(1.08);}
     .suggest-card .s-title{font-size:.98em;font-weight:600;padding:3px 4px; text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    /* Watchlist, lịch sử */
     #watchlist-bar, #history-bar {margin:0 5vw 15px 3vw;}
     .fav-chip, .history-chip{
       display:inline-block; margin:0 7px 8px 0; background:#eee4; padding:4px 11px;
@@ -102,7 +90,6 @@
     @media (max-width:500px){
       .movie-card{width:47vw;min-width:85px;}
     }
-    /* Footer */
     footer{color:#aaa;text-align:center;padding:23px 0 11px 0;font-size:.99em;}
     a, a:visited{color:#ffe27a;}
   </style>
@@ -113,11 +100,9 @@
     <input type="search" id="search" placeholder="Tìm kiếm phim..."/>
     <select id="genres"><option value="">Tất cả thể loại</option></select>
   </header>
-  <!-- Watchlist & History -->
   <div id="watchlist-bar"></div>
   <div id="history-bar"></div>
   <main id="movie-rows"></main>
-  <!-- Modal -->
   <div id="modal-player">
     <div id="modal-content">
       <button id="close-btn" onclick="closePlayer()">Đóng</button>
@@ -147,12 +132,10 @@
   const API_KEY = 'AIzaSyD5dWLgYZPu1_-AkwAaHPClGOOQ-Lq5EGI'
   const SHEET_RANGE = 'Sheet1!A2:H'
   const SCRIPT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbysq32epfb89btNoWGSxn-eEXMqeToCJQprpWkmNn_mIlyO9hfG1Kr8rHFjq47YX1eU/exec'
-
   let movieData = []; let genres = new Set();
   let currentMovie = null; let commentsCache = {};
   let watchlist=[], history=[];
-
-  // LocalStorage helpers
+  // ------ Watchlist --------
   function loadWatchlist(){watchlist = JSON.parse(localStorage.getItem('watchlist')||'[]');}
   function saveWatchlist(){localStorage.setItem('watchlist',JSON.stringify(watchlist));}
   function addWatch(id){ if(!watchlist.includes(id)){watchlist.unshift(id);} saveWatchlist(); renderWatchlist();}
@@ -168,8 +151,7 @@
     document.getElementById('watchlist-bar').innerHTML=html;
   }
   function clearWatchlist(){watchlist=[];saveWatchlist();renderWatchlist();}
-
-  // Lịch sử đã xem (local)
+  // ------ Lịch sử đã xem -------
   function loadHistory(){history=JSON.parse(localStorage.getItem('history')||'[]');}
   function saveHistory(){localStorage.setItem('history',JSON.stringify(history));}
   function addHistory(id){ 
@@ -187,7 +169,6 @@
     document.getElementById('history-bar').innerHTML=html;
   }
   function clearHistory(){history=[];saveHistory();renderHistory();}
-
   async function fetchMovies() {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_RANGE}?key=${API_KEY}`
     const res = await fetch(url)
@@ -197,15 +178,13 @@
     }))
     genres = new Set(movieData.map(m=>m.genre))
   }
-
-  // Hiển thị nhiều row theo thể loại (slider)
+  // --- Hiển thị phim theo hàng ---
   function renderMoviesByGenre() {
     let container = document.getElementById("movie-rows");
     container.innerHTML="";
     let gList=[...genres].filter(g=>g).sort();
     let rows = {};
     gList.forEach(g=>rows[g]=movieData.filter(m=>m.genre===g));
-    // Nếu có tìm kiếm thì chỉ show 1 row
     let search = document.getElementById("search").value.trim().toLowerCase();
     let genreSel = document.getElementById("genres").value;
     let filtered = movieData.filter(m=>{
@@ -230,7 +209,6 @@
       `;
     });
   }
-
   function movieCard(m){
     let isWatch=watchlist.includes(m.id);
     let isHist=history.includes(m.id);
@@ -257,14 +235,12 @@
     let e=document.getElementById('row-'+rowId);
     if(e){e.scrollBy({left:dir*320,behavior:'smooth'});}
   }
-
   function openPlayer(id) {
     currentMovie = movieData.find(m=>m.id===id)
     if(!currentMovie) return
     addHistory(currentMovie.id);
     document.body.style.overflow="hidden"
     document.getElementById("modal-player").style.display="flex"
-    // Drive preview
     const fileId = currentMovie.drive.match(/[-\w]{25,}/)
     const embedUrl = fileId ? `https://drive.google.com/file/d/${fileId}/preview`:""
     document.getElementById("player").innerHTML = embedUrl ?
@@ -275,7 +251,6 @@
     loadComments(currentMovie);
     renderSuggestion(currentMovie);
   }
-
   function renderDetail(movie) {
     document.getElementById("movie-detail").innerHTML = `
       <img id="detail-poster" src="${movie.poster||''}" alt="${movie.title}"/>
@@ -286,6 +261,101 @@
       <div id="detail-desc">${movie.desc||''}</div>
     `
   }
-
   function renderRatingForm(movie) {
-    document.getElement
+    document.getElementById("rating-form").innerHTML = `
+      <form onsubmit="sendRating(event)">
+        <label>Chấm điểm phim: </label>
+        <select id="input-rating" required>
+          <option value="">Chọn...</option>
+          <option value="1">1 điểm</option>
+          <option value="2">2 điểm</option>
+          <option value="3">3 điểm</option>
+          <option value="4">4 điểm</option>
+          <option value="5">5 điểm</option>
+        </select>
+        <button type="submit">Gửi</button>
+      </form>
+    `
+  }
+  async function sendRating(event) {
+    event.preventDefault()
+    const rating = document.getElementById("input-rating").value
+    if (!rating || !currentMovie.id) return
+    await fetch(SCRIPT_ENDPOINT,{
+      method:"POST",
+      body: JSON.stringify({type:"rating",id:currentMovie.id,rating}),
+      headers:{ "Content-Type":"application/json" }
+    })
+    alert("Chấm điểm thành công!")
+    closePlayer(); await refreshAll();
+  }
+  async function loadComments(movie) {
+    const res = await fetch(`${SCRIPT_ENDPOINT}?type=comments&id=${movie.id}`)
+    const data = await res.json()
+    const comments = data.comments || []
+    commentsCache[movie.id] = comments
+    document.getElementById("comments").innerHTML = "<h4>Bình luận:</h4>" +
+      (comments.length?
+      comments.map(c=>`
+        <div class="comment">
+          <div class="comment-author">${c.author||'Ẩn danh'} ${c.rating?`★ ${c.rating}/5`:""}</div>
+          <div class="comment-text">${c.text}</div>
+        </div>
+      `).join(''): '<i>Chưa có bình luận nào.</i>')
+  }
+  async function sendComment(event) {
+    event.preventDefault()
+    if(!currentMovie) return
+    const author = document.getElementById("comment-author").value
+    const text = document.getElementById("comment-text").value
+    const rating = document.getElementById("comment-rating").value
+    if(!author||!text||!rating) return
+    await fetch(SCRIPT_ENDPOINT,{
+      method:"POST",
+      body: JSON.stringify({type:"comment",id:currentMovie.id,author,text,rating}),
+      headers:{"Content-Type":"application/json"}
+    })
+    alert("Bình luận đã gửi!")
+    document.getElementById("comment-author").value=""
+    document.getElementById("comment-text").value=""
+    document.getElementById("comment-rating").value=""
+    await loadComments(currentMovie)
+  }
+  function renderSuggestion(movie){
+    let suggest = movieData.filter(m=>m.genre===movie.genre && m.id!==movie.id)
+    document.getElementById("suggestion-title").innerText = suggest.length?"Phim liên quan:":"";
+    document.getElementById("suggest-row").innerHTML = suggest.map(m=>`
+      <div class="suggest-card" onclick="openPlayer('${m.id}')">
+        <img src="${m.poster||'https://img.icons8.com/color/480/movie-projector.png'}" />
+        <div class="s-title">${m.title}</div>
+      </div>`).join('');
+  }
+  function closePlayer() {
+    document.getElementById("modal-player").style.display = "none"
+    document.getElementById("player").innerHTML=""
+    document.getElementById("movie-detail").innerHTML=""
+    document.getElementById("comments").innerHTML=""
+    document.getElementById("rating-form").innerHTML=""
+    document.getElementById("suggestion-title").innerHTML = ""
+    document.getElementById("suggest-row").innerHTML = ""
+    currentMovie=null
+    document.body.style.overflow=""
+  }
+  async function refreshAll() {
+    await fetchMovies();
+    renderGenres();
+    loadWatchlist(); renderWatchlist();
+    loadHistory(); renderHistory();
+    renderMoviesByGenre();
+  }
+  function renderGenres() {
+    const sel = document.getElementById("genres")
+    sel.innerHTML = '<option value="">Tất cả thể loại</option>' +
+      Array.from(genres).map(g=>`<option value="${g}">${g}</option>`).join('')
+  }
+  document.getElementById("search").addEventListener("input", renderMoviesByGenre);
+  document.getElementById("genres").addEventListener("change", renderMoviesByGenre);
+  window.onload = refreshAll;
+  </script>
+</body>
+</html>
