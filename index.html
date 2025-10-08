@@ -163,14 +163,34 @@
   }
   function clearHistory(){history=[];saveHistory();renderHistory();}
   async function fetchMovies() {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_RANGE}?key=${API_KEY}`
-    const res = await fetch(url)
-    const data = await res.json()
-    movieData = (data.values||[]).map(row=>({
-      title:row[0]||"",desc:row[1]||"",genre:row[2]||"",drive:row[3]||"",poster:row[4]||"",year:row[5]||"",rating:parseFloat(row[6]||'0'),id:row[7]||""
-    }))
-    genres = new Set(movieData.map(m=>m.genre));
-  }
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_RANGE}?key=${API_KEY}`
+  const res = await fetch(url)
+  const data = await res.json()
+  const rows = data.values || [];
+  if (!rows.length) return movieData = [];
+  // Dò index các cột dựa vào header sheet
+  const header = rows[0].map(h => h.trim());
+  const idxTitle  = header.findIndex(x=>x.toLowerCase().includes("tên"));
+  const idxDesc   = header.findIndex(x=>x.toLowerCase().includes("mô tả"));
+  const idxGenre  = header.findIndex(x=>x.toLowerCase().includes("thể loại"));
+  const idxDrive  = header.findIndex(x=>x.toLowerCase().includes("drive"));
+  const idxPoster = header.findIndex(x=>x.toLowerCase().includes("poster"));
+  const idxYear   = header.findIndex(x=>x.toLowerCase().includes("năm"));
+  const idxRating = header.findIndex(x=>x.toLowerCase().includes("điểm"));
+  const idxID     = header.findIndex(x=>x.toLowerCase() === "id");
+
+  movieData = rows.slice(1).map(row => ({
+    title:  row[idxTitle]  || "",
+    desc:   row[idxDesc]   || "",
+    genre:  row[idxGenre]  || "",
+    drive:  row[idxDrive]  || "",
+    poster: row[idxPoster] || "",
+    year:   row[idxYear]   || "",
+    rating: parseFloat(row[idxRating]||"0"),
+    id:     row[idxID]     || ""
+  })).filter(m => m.title && m.id); // chỉ lấy dòng còn đủ thông tin phim
+  genres = new Set(movieData.map(m=>m.genre));
+}
   function renderMoviesByGenre() {
     let container = document.getElementById("movie-rows");
     container.innerHTML="";
