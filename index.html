@@ -229,21 +229,33 @@
     if(e){e.scrollBy({left:dir*320,behavior:'smooth'});}
   }
   function openPlayer(id) {
-    currentMovie = movieData.find(m=>m.id===id)
-    if(!currentMovie) return
-    addHistory(currentMovie.id);
-    document.body.style.overflow="hidden"
-    document.getElementById("modal-player").style.display="flex"
-    const fileId = currentMovie.drive.match(/[-\w]{25,}/)
-    const embedUrl = fileId ? `https://drive.google.com/file/d/${fileId}/preview`:""
-    document.getElementById("player").innerHTML = embedUrl ?
-      `<iframe src="${embedUrl}" width="800" height="450" allow="autoplay" allowfullscreen style="border-radius:11px"></iframe>`:
-      '<div>Không có video</div>'
-    renderDetail(currentMovie);
-    renderRatingForm(currentMovie);
-    loadComments(currentMovie);
-    renderSuggestion(currentMovie);
-  }
+  // Reset toàn bộ modal để tránh lưu trạng thái cũ
+  document.getElementById("player").innerHTML = "";
+  document.getElementById("movie-detail").innerHTML = "";
+  document.getElementById("comments").innerHTML = "";
+  document.getElementById("rating-form").innerHTML = "";
+  document.getElementById("suggestion-title").innerHTML = "";
+  document.getElementById("suggest-row").innerHTML = "";
+
+  // Đặt phim mới
+  currentMovie = movieData.find(m=>m.id===id)
+  if(!currentMovie) return
+  addHistory(currentMovie.id);
+  document.body.style.overflow="hidden"
+  document.getElementById("modal-player").style.display="flex"
+  // Google Drive preview
+  const fileId = currentMovie.drive.match(/[-\w]{25,}/)
+  const embedUrl = fileId ? `https://drive.google.com/file/d/${fileId}/preview`:""
+  // Gắn lại iframe mới (giúp xem video khác không bị bug)
+  document.getElementById("player").innerHTML = embedUrl ?
+    `<iframe src="${embedUrl}" width="800" height="450" allow="autoplay" allowfullscreen style="border-radius:11px"></iframe>`:
+    '<div>Không có video</div>'
+  
+  renderDetail(currentMovie);
+  renderRatingForm(currentMovie);
+  loadComments(currentMovie);
+  renderSuggestion(currentMovie);
+}
   function renderDetail(movie) {
     document.getElementById("movie-detail").innerHTML = `
       <img id="detail-poster" src="${movie.poster||''}" alt="${movie.title}"/>
