@@ -163,33 +163,44 @@
   }
   function clearHistory(){history=[];saveHistory();renderHistory();}
   // --- SỬA fetchMovies: lấy đúng các dòng, tránh lỗi chỉ hiện 1 phim ---
-  async function fetchMovies() {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_RANGE}?key=${API_KEY}`
-    const res = await fetch(url)
-    const data = await res.json()
-    const rows = data.values || [];
-    if (!rows.length) return movieData = [];
-    const header = rows[0].map(h => h.trim().toLowerCase());
-    const idxTitle  = header.findIndex(x=>x.includes("tên"));
-    const idxDesc   = header.findIndex(x=>x.includes("mô tả"));
-    const idxGenre  = header.findIndex(x=>x.includes("loại"));
-    const idxDrive  = header.findIndex(x=>x.includes("drive"));
-    const idxPoster = header.findIndex(x=>x.includes("poster"));
-    const idxYear   = header.findIndex(x=>x.includes("năm"));
-    const idxRating = header.findIndex(x=>x.includes("điểm"));
-    const idxID     = header.findIndex(x=>x==="id");
-    movieData = rows.slice(1).map(row => ({
-      title:  row[idxTitle]  || "",
-      desc:   row[idxDesc]   || "",
-      genre:  row[idxGenre]  || "",
-      drive:  row[idxDrive]  || "",
-      poster: row[idxPoster] || "",
-      year:   row[idxYear]   || "",
-      rating: parseFloat(row[idxRating]||"0"),
-      id:     row[idxID]     || ""
-    })).filter(m => m.title && m.id);
-    genres = new Set(movieData.map(m=>m.genre));
-  }
+  <script>
+const SHEET_ID = '15mFrve7Z-_zi_7AvSq3t9Nti1VjINVHCQDF7LRmP1QQ'
+const API_KEY = 'AIzaSyD5dWLgYZPu1_-AkwAaHPClGOOQ-Lq5EGI'
+const SHEET_RANGE = 'Sheet1!A1:K'
+const SCRIPT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbysq32epfb89btNoWGSxn-eEXMqeToCJQprpWkmNn_mIlyO9hfG1Kr8rHFjq47YX1eU/exec'
+let movieData = []; let genres = new Set();
+
+async function fetchMovies() {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_RANGE}?key=${API_KEY}`
+  const res = await fetch(url)
+  const data = await res.json()
+  const rows = data.values || [];
+  if (!rows.length) return movieData = [];
+  const header = rows[0].map(h => h.trim().toLowerCase());
+
+  const idxTitle    = header.findIndex(x => x=="tên phim");
+  const idxDesc     = header.findIndex(x => x=="mô tả");
+  const idxGenre    = header.findIndex(x => x=="thể loại");
+  const idxDrive    = header.findIndex(x => x.indexOf("drive")>=0);
+  const idxPoster   = header.findIndex(x => x.indexOf("poster")>=0);
+  const idxYear     = header.findIndex(x => x=="năm");
+  const idxRating   = header.findIndex(x => x.indexOf("điểm")>=0);
+  const idxID       = header.findIndex(x => x.indexOf("id")>=0);
+
+  movieData = rows.slice(1).map(row => ({
+    title:  row[idxTitle]  || "",
+    desc:   row[idxDesc]   || "",
+    genre:  row[idxGenre]  || "",
+    drive:  row[idxDrive]  || "",
+    poster: row[idxPoster] || "",
+    year:   row[idxYear]   || "",
+    rating: parseFloat(row[idxRating]||"0"),
+    id:     row[idxID]     || ""
+  })).filter(m => m.title && m.id);
+
+  genres = new Set(movieData.map(m=>m.genre));
+}
+</script>
   // --- Giữ nguyên toàn bộ các hàm renderMovies, openPlayer ... ---
   function renderMoviesByGenre() {
     let container = document.getElementById("movie-rows");
