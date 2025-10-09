@@ -123,57 +123,16 @@
       Bạn đang xem phim tại <b style="color:#e50914;font-weight:700;font-size:1.01em;vertical-align:middle;">MovieHub</b>
     </span>
   </div>
- <!-- Cắt gọn, xem hướng dẫn code bổ sung bên dưới (tất cả logic nằm ở script) -->
-
-<!-- Modal Đăng nhập (HTML thêm vào cuối body): -->
-<div id="login-modal" style="display:none;position:fixed;z-index:9000;left:0;top:0;width:100vw;height:100vh;background:#111a;backdrop-filter:blur(2px);align-items:center;justify-content:center;">
-  <div id="login-modal-box" style="background:#262626;padding:31px 25px 24px 25px;border-radius:15px;box-shadow:0 2px 40px #000b;font-size:1.09em;min-width:210px;text-align:center;">
-    <b>Đăng nhập để xem phim đặc biệt</b><br><br>
-    <input id="user" placeholder="Tài khoản"><br>
-    <input type="password" id="pass" placeholder="Mật khẩu"><br>
-    <button onclick="doLoginMoviehub()">Đăng nhập</button>
-    <div id="login-error" style="color:#e50914;margin-top:10px;display:none;">Sai tài khoản hoặc mật khẩu.</div>
+  <!-- Modal login -->
+  <div id="login-modal">
+    <div id="login-modal-box">
+      <b>Đăng nhập để xem phim đặc biệt</b><br><br>
+      <input id="user" placeholder="Tài khoản"><br>
+      <input type="password" id="pass" placeholder="Mật khẩu"><br>
+      <button onclick="doLoginMoviehub()">Đăng nhập</button>
+      <div id="login-error">Sai tài khoản hoặc mật khẩu.</div>
+    </div>
   </div>
-</div>
-<script>
-// ==== Lưu userList vào biến toàn cục, KHÔNG gọi lại khi mỗi lần đăng nhập
-let userList = [];
-async function fetchUsers() {
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Users!A2:C?key=${API_KEY}`;
-  const res = await fetch(url); const data = await res.json();
-  // Dòng 0: Username, 1: Password, 2: Role
-  userList = (data.values||[]).map(row=>({user:row[0]?.trim(), pass:row[1]?.trim(), role:row[2]?.trim()}));
-}
-// -- fix: gọi fetchUsers() khi onload để có userList chắc chắn
-window.addEventListener("load", async () => {
-  await fetchUsers();
-  await fetchMovies();
-  renderGenres();
-  renderMovies();
-  ... // các phần khác giữ nguyên
-});
-// ====== Hàm đăng nhập đúng chuẩn
-function showLoginModal() {
-  document.getElementById('login-modal').style.display = 'flex';
-  document.getElementById('login-error').style.display = 'none';
-  document.getElementById('user').value='';
-  document.getElementById('pass').value='';
-}
-function doLoginMoviehub() {
-  const u = document.getElementById('user').value.trim();
-  const p = document.getElementById('pass').value.trim();
-  let found = userList.find(row=>row.user===u && row.pass===p);
-  if(found){
-    localStorage.setItem("user_logged_in",'yes');
-    localStorage.setItem("user_name",found.user);
-    document.getElementById('login-modal').style.display='none';
-    document.getElementById('logout-btn').style.display='inline-block';
-    openPlayer(currentMovie.id);
-  } else {
-    document.getElementById('login-error').style.display='block';
-  }
-}
-</script>
   <footer>
     &copy; 2025 MovieHub. Trang xem phim online miễn phí – Giao diện đẹp, chia sẻ link từng phim dễ dàng.
   </footer>
@@ -190,9 +149,8 @@ function doLoginMoviehub() {
   async function fetchUsers() {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${USERS_RANGE}?key=${API_KEY}`;
     const res = await fetch(url); const data = await res.json();
-    userList = (data.values||[]).map(row=>({user:row[0], pass:row[1], role:row[2]}));
+    userList = (data.values||[]).map(row=>({user:String(row[0]||"").trim(), pass:String(row[1]||"").trim(), role:row[2]}));
   }
-  // Phim
   async function fetchMovies() {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_RANGE}?key=${API_KEY}`;
     const res = await fetch(url); const data = await res.json();
@@ -263,7 +221,6 @@ function doLoginMoviehub() {
         </div>
       </div>`;
   }
-  // === LOGO POPUP function ===
   function showPopupMovieHub() {
     let popup = document.getElementById('moviehub-popup');
     popup.style.display = 'flex';
@@ -272,26 +229,25 @@ function doLoginMoviehub() {
     window.moviehubPopupTimeout = setTimeout(()=>{
       popup.style.opacity = '0';
       setTimeout(()=>popup.style.display='none', 600);
-    }, 6000); // 6 giây
+    }, 6000);
   }
-  // ==== ĐĂNG NHẬP ====
   function showLoginModal() {
     document.getElementById('login-modal').style.display = 'flex';
     document.getElementById('login-error').style.display = 'none';
     document.getElementById('user').value='';
     document.getElementById('pass').value='';
+    document.getElementById('user').focus();
   }
   function doLoginMoviehub() {
     const u = document.getElementById('user').value.trim();
-    const p = document.getElementById('pass').value;
-    if(!userList.length){alert('Chưa có dữ liệu User, hãy thử lại!');return;}
+    const p = document.getElementById('pass').value.trim();
     let found = userList.find(row=>row.user===u && row.pass===p);
     if(found){
       localStorage.setItem("user_logged_in",'yes');
       localStorage.setItem("user_name",found.user);
       document.getElementById('login-modal').style.display='none';
       document.getElementById('logout-btn').style.display='inline-block';
-      openPlayer(currentMovie.id); // Thử mở lại phim
+      openPlayer(currentMovie.id);
     } else {
       document.getElementById('login-error').style.display='block';
     }
@@ -302,12 +258,10 @@ function doLoginMoviehub() {
     document.getElementById('logout-btn').style.display='none';
     alert('Đã đăng xuất!');
   }
-  // ==== MỞ PHIM (KHOÁ) ====
   function openPlayer(id) {
     currentMovie = movieData.find(m=>m.id===id);
     if (!currentMovie) return;
     if(currentMovie.special && !localStorage.getItem("user_logged_in")){
-      // Nếu là phim đặc biệt, chưa đăng nhập thì show login modal
       showLoginModal();
       return;
     }
@@ -355,7 +309,6 @@ function doLoginMoviehub() {
   function scrollToMain() {
     document.getElementById('movie-rows').scrollIntoView({behavior:'smooth'});
   }
-  // Khi truy cập có #id=, tự động mở modal phim tương ứng (SPA like)
   window.addEventListener("load", async ()=> {
     await fetchUsers();
     await fetchMovies();
@@ -377,7 +330,6 @@ function doLoginMoviehub() {
       closePlayer();
     }
   });
-
   document.getElementById("search").addEventListener("input", renderMovies);
   document.getElementById("genres").addEventListener("change", renderMovies);
   </script>
