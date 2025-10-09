@@ -12,8 +12,8 @@
     .right {margin-left:auto;}
     .btn {padding:8px 17px;border:none;border-radius:7px;background:#e50914;color:#fff;font-weight:600;cursor:pointer;}
     .btn:hover {background:#aa0814;}
-    .logout {background:transparent;color:#ffe066;border:none;margin-left:20px;font-size:1em;}
-    .logout:hover {color:#e50914;}
+    .logout, .loginhdr {background:transparent;color:#ffe066;border:none;margin-left:20px;font-size:1em;}
+    .logout:hover, .loginhdr:hover {color:#e50914;}
     .container {max-width:1040px;margin:0 auto;padding:28px 7vw 90px 7vw;}
     h2 {margin-top:40px;text-shadow:0 2px 6px #0009;}
     .phimlist {display:flex;flex-wrap:wrap;gap:32px;}
@@ -24,7 +24,7 @@
     .badge-new{display:inline-block;background:#e50914;color:#fff;padding:2px 13px 2px 13px;font-size:.96em;border-radius:7px;margin:8px 0 0 13px;}
     .badge-locked{background:#bbb;color:#222;padding:2px 12px;border-radius:9px;font-size:.97em;position:absolute;top:11px;right:13px;}
     .watchbtn{margin:15px 0 0 15px;padding:7px 21px;font-size:1.01em;}
-    .watchbtn[disabled]{background:#666;color:#bbb;cursor:not-allowed;}
+    .watchbtn.locked{background:#666;color:#ccc;}
     .modal{position:fixed;inset:0;background:#101826cc;backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:9999;}
     .modalInner{background:#232323;padding:27px 21px 21px 21px;border-radius:16px;width:320px;max-width:99vw;box-shadow:0 8px 32px #000b;}
     .modal h3{margin-top:0;}
@@ -47,7 +47,10 @@
 <header>
   <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png" class="logo" alt="MovieHub"/>
   <span class="title">MovieHub</span>
-  <div class="right"><button id="logoutBtn" class="logout" style="display:none" onclick="logoutApp()">Đăng xuất</button></div>
+  <div class="right">
+    <button id="loginBtn" class="loginhdr btn" onclick="showLogin()" style="display:inline-block">Đăng nhập</button>
+    <button id="logoutBtn" class="logout" onclick="logoutApp()" style="display:none">Đăng xuất</button>
+  </div>
 </header>
 <div class="container">
   <h2>Kho phim online - Xem phim theo đặc quyền tài khoản</h2>
@@ -79,7 +82,7 @@ const SHEET_RANGE = 'Sheet1!A1:Z';
 const USERS_RANGE = 'Users!A2:C';
 let userList = [];
 let phimList = [];
-let loggedUser = null, userName = '';
+let loggedUser = false, userName = '';
 
 async function fetchUsers() {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${USERS_RANGE}?key=${API_KEY}`;
@@ -111,10 +114,14 @@ function renderPhim() {
     <img class="phimimg" src="${m.poster||'https://img.icons8.com/color/480/movie-projector.png'}" alt="">
     <div class="phimtitle">${m.title}</div>
     <div class="phimmeta">${m.genre||'Chưa rõ'} | ${m.year||''}</div>
-    <button class="btn watchbtn" onclick="showPhim('${encodeURIComponent(m.id)}')" ${m.special&&!loggedUser?'disabled':''}>${m.special&&!loggedUser?'Chỉ thành viên':'Xem phim'}</button>
+    <button class="btn watchbtn${m.special&&!loggedUser?' locked':''}"
+      onclick="${m.special&&!loggedUser?'showLogin()':`showPhim('${encodeURIComponent(m.id)}')`}">
+      ${m.special&&!loggedUser?'Chỉ thành viên':'Xem phim'}
+    </button>
   </div>`).join('');
   document.getElementById('phimlist').innerHTML = html;
   document.getElementById('logoutBtn').style.display = loggedUser ? 'inline-block' : 'none';
+  document.getElementById('loginBtn').style.display = loggedUser ? 'none' : 'inline-block';
 }
 
 function showPhim(_id){
