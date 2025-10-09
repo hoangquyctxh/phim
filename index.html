@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
-  <title>MovieHub - Giao diện phát phim đẹp, tối/sáng</title>
+  <title>MovieHub - Giao diện phát phim đẹp, tối/sáng, scroll modal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     :root {
@@ -37,13 +37,14 @@
     .badge-locked{background:#bbb;color:#222;padding:2px 12px;border-radius:9px;font-size:.97em;position:absolute;top:11px;right:13px;}
     .watchbtn{margin:15px 0 0 15px;padding:7px 21px;font-size:1.01em;}
     .watchbtn.locked{background:#666;color:#ccc;}
-    /* MODAL PLAYER được custom */
+    /* MODAL PLAYER được custom + scroll */
     .modal{position:fixed;inset:0;background:#101826cc;backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:9999;}
     .modalDriveCustom {
       background: linear-gradient(134deg, var(--bg-modal) 70%, #17181d 100%);
       border-radius: 22px; box-shadow:0 8px 56px #000f,0 1px 0 #333b;
       padding:29px 22px 27px 22px; min-width:300px; width:97vw; max-width:640px; position:relative; color:var(--txt-main);
       animation:fadeIn .5s;
+      max-height:90vh; display:flex; flex-direction:column;overflow-y:auto;
     }
     @media (max-width:900px){.modalDriveCustom{max-width:99vw;padding:13px 1vw 20px 1vw;}}
     .player-drive-wrap{ width:100%; background:#111; border-radius:19px;overflow:hidden;box-shadow:0 6px 48px #0008;position:relative;}
@@ -54,7 +55,8 @@
     .player-title{font-size:1.16em;font-weight:700;line-height:1.4;color:var(--toolbar-title);text-shadow:0 1px 9px #1118;}
     .btnshare{padding:7px 16px;border-radius:10px;background:#ffe066;color:#222;font-weight:600;border:none;font-size:.99em;cursor:pointer;}
     .btnshare:hover{background:#ffc800;}
-    .player-desc{margin-top:12px;font-size:.99em;line-height:1.51;color:#ffd;}
+    #playerDesc.player-desc{margin-top:12px;font-size:.99em;line-height:1.51;color:#ffd;max-height:180px;overflow-y:auto;margin-bottom:2px;padding-right:4px;}
+    @media (max-width:800px){#playerDesc.player-desc{max-height:29vw;}}
     .closebtn{background:#e50914;color:#fff;border:none;border-radius:13px;padding:8px 13px;font-size:1.34em;cursor:pointer;font-weight:700;position:absolute;right:14px;top:11px;}
     .closebtn:hover{background:#be0009;}
     @keyframes fadeIn{0%{opacity:0;transform:scale(.91);}50%{opacity:.75;}100%{opacity:1;transform:scale(1);}}
@@ -99,7 +101,7 @@
   </div>
 </div>
 <div id="playerModal" class="modal" style="display:none;">
-  <div class="modalDriveCustom">
+  <div class="modalDriveCustom" onclick="event.stopPropagation();">
     <button class="closebtn" onclick="closePlayer()">&times;</button>
     <div class="player-drive-wrap">
       <iframe id="driveFrame" src="" allowfullscreen allow="autoplay"
@@ -185,7 +187,7 @@ function renderPhim() {
   document.getElementById('loginBtn').style.display = loggedUser ? 'none' : 'inline-block';
 }
 
-// --- MODAL PLAYER CONTROL, share hash, watermark ---
+// --- MODAL PLAYER CONTROL ---
 function showPhim(_id){
   let phim = phimList.find(m=>encodeURIComponent(m.id)===_id);
   if(!phim) return alert("Không tìm thấy phim");
@@ -209,6 +211,9 @@ function closePlayer(){
   document.getElementById('playerModal').style.display='none';
   history.replaceState(null, null, window.location.pathname);
 }
+document.getElementById('playerModal').addEventListener('dblclick', function(e){
+  if(e.target === this){ closePlayer(); }
+});
 // --- ĐĂNG NHẬP/ĐĂNG XUẤT/Modal ---
 function showLogin(){
   document.getElementById('loginModal').style.display = 'flex';
