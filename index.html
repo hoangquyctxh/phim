@@ -92,7 +92,7 @@
 <body>
   <header>
     <div class="logo-moviehub">
-      <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png" alt="MovieHub Logo"/>
+      <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png" alt="MovieHub Logo" style="height:38px;width:auto;display:block;">
       <span>MovieHub</span>
     </div>
     <input type="search" id="search" placeholder="Tìm kiếm phim..."/>
@@ -123,14 +123,13 @@
       Bạn đang xem phim tại <b style="color:#e50914;font-weight:700;font-size:1.01em;vertical-align:middle;">MovieHub</b>
     </span>
   </div>
-  <!-- Modal login -->
-  <div id="login-modal">
-    <div id="login-modal-box">
+  <div id="login-modal" style="display:none;position:fixed;z-index:9000;left:0;top:0;width:100vw;height:100vh;background:#111a;backdrop-filter:blur(2px);align-items:center;justify-content:center;">
+    <div style="background:#262626;padding:32px 20px 18px 20px;border-radius:13px;box-shadow:0 2px 40px #000b;min-width:210px;font-size:1.12em;text-align:center;">
       <b>Đăng nhập để xem phim đặc biệt</b><br><br>
       <input id="user" placeholder="Tài khoản"><br>
       <input type="password" id="pass" placeholder="Mật khẩu"><br>
       <button onclick="doLoginMoviehub()">Đăng nhập</button>
-      <div id="login-error">Sai tài khoản hoặc mật khẩu.</div>
+      <div id="login-error" style="color:#e50914;margin-top:10px;display:none;">Sai tài khoản hoặc mật khẩu.</div>
     </div>
   </div>
   <footer>
@@ -145,7 +144,6 @@
   let userList = [];
   let currentMovie = null;
 
-  // Fetch User DB từ Sheet
   async function fetchUsers() {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${USERS_RANGE}?key=${API_KEY}`;
     const res = await fetch(url); const data = await res.json();
@@ -236,7 +234,7 @@
     document.getElementById('login-error').style.display = 'none';
     document.getElementById('user').value='';
     document.getElementById('pass').value='';
-    document.getElementById('user').focus();
+    setTimeout(()=>document.getElementById('user').focus(), 100);
   }
   function doLoginMoviehub() {
     const u = document.getElementById('user').value.trim();
@@ -247,7 +245,7 @@
       localStorage.setItem("user_name",found.user);
       document.getElementById('login-modal').style.display='none';
       document.getElementById('logout-btn').style.display='inline-block';
-      openPlayer(currentMovie.id);
+      if(currentMovie && currentMovie.id) openPlayer(currentMovie.id);
     } else {
       document.getElementById('login-error').style.display='block';
     }
