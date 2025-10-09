@@ -2,20 +2,22 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
-  <title>MovieHub - Đăng nhập, xem phim theo quyền</title>
+  <title>MovieHub - Xem phim online theo quyền</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {margin:0;background:#181818;color:#fff;font-family:'Segoe UI',Arial,sans-serif;}
-    header {display:flex;align-items:center;gap:13px;padding:12px 8vw 14px 4vw;background:#212121;border-bottom:2px solid #222;}
+    header {display:flex;align-items:center;gap:13px;padding:12px 8vw 14px 4vw;background:#212121;}
     .logo {height:38px;}
     .title {font-size:2em;color:#e50914;font-weight:bold;margin-left:3px;}
-    .right {margin-left:auto;}
+    .right {margin-left:auto;display:flex;gap:15px;align-items:center;}
     .btn {padding:8px 17px;border:none;border-radius:7px;background:#e50914;color:#fff;font-weight:600;cursor:pointer;}
     .btn:hover {background:#aa0814;}
-    .logout, .loginhdr {background:transparent;color:#ffe066;border:none;margin-left:20px;font-size:1em;}
+    .logout, .loginhdr {background:transparent;color:#ffe066;border:none;font-size:1em;}
     .logout:hover, .loginhdr:hover {color:#e50914;}
-    .container {max-width:1040px;margin:0 auto;padding:28px 7vw 90px 7vw;}
+    #genreFilter {padding:8px 14px;font-size:1em;border-radius:7px;background:#262626;color:#ffe066;border:none;}
+    .container {max-width:1040px;margin:0 auto;padding:28px 7vw 70px 7vw;}
     h2 {margin-top:40px;text-shadow:0 2px 6px #0009;}
+    .row-title {color:#ffd24a;font-size:1.1em;margin:40px 0 16px 7px;font-weight:700;}
     .phimlist {display:flex;flex-wrap:wrap;gap:32px;}
     .phimcard {flex:0 0 210px;background:#222;border-radius:17px;padding:0 0 13px 0;box-shadow:0 3px 30px #1118;overflow:hidden;position:relative;margin-bottom:14px;}
     .phimimg {width:100%;aspect-ratio:2/3;object-fit:cover;border-bottom:2px solid #262626;}
@@ -40,6 +42,7 @@
       .container{padding:12px 2vw 60px 2vw;}
       .phimlist{gap:12vw;}
       .phimcard{flex-basis:47vw;max-width:97vw;}
+      header {flex-direction:column;align-items:flex-start;gap:8px;}
     }
   </style>
 </head>
@@ -47,6 +50,7 @@
 <header>
   <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png" class="logo" alt="MovieHub"/>
   <span class="title">MovieHub</span>
+  <select id="genreFilter"><option value="">Tất cả thể loại</option></select>
   <div class="right">
     <button id="loginBtn" class="loginhdr btn" onclick="showLogin()" style="display:inline-block">Đăng nhập</button>
     <button id="logoutBtn" class="logout" onclick="logoutApp()" style="display:none">Đăng xuất</button>
@@ -54,7 +58,7 @@
 </header>
 <div class="container">
   <h2>Kho phim online - Xem phim theo đặc quyền tài khoản</h2>
-  <div id="phimlist" class="phimlist"></div>
+  <div id="genreRows"></div>
 </div>
 <div id="loginModal" class="modal" style="display:none;">
   <div class="modalInner">
@@ -83,6 +87,7 @@ const USERS_RANGE = 'Users!A2:C';
 let userList = [];
 let phimList = [];
 let loggedUser = false, userName = '';
+let genresSet = new Set();
 
 async function fetchUsers() {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${USERS_RANGE}?key=${API_KEY}`;
@@ -97,7 +102,7 @@ async function fetchPhim() {
   phimList = rows.slice(1).map(row=>({
     title:row[idx('tên phim')]||'',
     desc:row[idx('mô tả')]||'',
-    genre:row[idx('thể loại')]||'',
+    genre:row[idx('thể loại')]||'Khác',
     drive:row[idx('link google drive')]||'',
     poster:row[idx('link poster')]||'',
     year:row[idx('năm')]||'',
@@ -105,21 +110,41 @@ async function fetchPhim() {
     special: (row[idx('special')]||'').trim().toLowerCase()==='yes',
     isNew: row[idx('năm')] && +row[idx('năm')] >= (new Date().getFullYear()-1)
   })).filter(m=>m.title);
+  genresSet = new Set(phimList.map(m=>m.genre).filter(g=>g&&g!==''));
+}
+
+function updateGenreOptions() {
+  let sel = document.getElementById("genreFilter");
+  sel.innerHTML = `<option value="">Tất cả thể loại</option>
+    ${Array.from(genresSet).map(g=>`<option value="${g}">${g}</option>`).join('')}`;
 }
 
 function renderPhim() {
-  let html = phimList.map(m=>`<div class="phimcard">
-    ${m.isNew?'<span class="badge-new">MỚI</span>':''}
-    ${m.special?'<span class="badge-locked">Khoá</span>':''}
-    <img class="phimimg" src="${m.poster||'https://img.icons8.com/color/480/movie-projector.png'}" alt="">
-    <div class="phimtitle">${m.title}</div>
-    <div class="phimmeta">${m.genre||'Chưa rõ'} | ${m.year||''}</div>
-    <button class="btn watchbtn${m.special&&!loggedUser?' locked':''}"
-      onclick="${m.special&&!loggedUser?'showLogin()':`showPhim('${encodeURIComponent(m.id)}')`}">
-      ${m.special&&!loggedUser?'Chỉ thành viên':'Xem phim'}
-    </button>
-  </div>`).join('');
-  document.getElementById('phimlist').innerHTML = html;
+  const sel = document.getElementById("genreFilter");
+  let selected = sel.value || '';
+  let phimTheoGenre = {};
+  phimList.filter(m=>!selected||m.genre===selected)
+    .forEach(m=>(phimTheoGenre[m.genre]=phimTheoGenre[m.genre]||[]).push(m));
+
+  let html = '';
+  for(const genre of Object.keys(phimTheoGenre)){
+    html += `<div class="row-title">${genre}</div>
+      <div class="phimlist">${
+        phimTheoGenre[genre].map(m=>`<div class="phimcard">
+        ${m.isNew?'<span class="badge-new">MỚI</span>':''}
+        ${m.special?'<span class="badge-locked">Khoá</span>':''}
+        <img class="phimimg" src="${m.poster||'https://img.icons8.com/color/480/movie-projector.png'}" alt="">
+        <div class="phimtitle">${m.title}</div>
+        <div class="phimmeta">${m.genre||'Chưa rõ'} | ${m.year||''}</div>
+        <button class="btn watchbtn${m.special&&!loggedUser?' locked':''}"
+          onclick="${m.special&&!loggedUser?'showLogin()':`showPhim('${encodeURIComponent(m.id)}')`}">
+          ${m.special&&!loggedUser?'Chỉ thành viên':'Xem phim'}
+        </button>
+      </div>`).join('')
+      }</div>`;
+  }
+
+  document.getElementById('genreRows').innerHTML = html;
   document.getElementById('logoutBtn').style.display = loggedUser ? 'inline-block' : 'none';
   document.getElementById('loginBtn').style.display = loggedUser ? 'none' : 'inline-block';
 }
@@ -128,6 +153,7 @@ function showPhim(_id){
   let phim = phimList.find(m=>encodeURIComponent(m.id)===_id);
   if(!phim) return alert("Không tìm thấy phim");
   if(phim.special&&!loggedUser) { showLogin(); return; }
+  location.hash = "id=" + encodeURIComponent(phim.id);
   document.getElementById('player').innerHTML = phim.drive.match(/[-\w]{25,}/)
     ? `<iframe src="https://drive.google.com/file/d/${phim.drive.match(/[-\w]{25,}/)}/preview" allowfullscreen style="width:100%;aspect-ratio:16/9;min-height:200px;border:none;"></iframe>`
     : '<div style="color:#fff;text-align:center">Không có video</div>';
@@ -137,6 +163,7 @@ function showPhim(_id){
 function closePlayer(){
   document.getElementById('player').innerHTML='';
   document.getElementById('playerModal').style.display='none';
+  history.replaceState(null, null, window.location.pathname);
 }
 function showLogin(){
   document.getElementById('loginModal').style.display = 'flex';
@@ -171,8 +198,22 @@ function logoutApp(){
 window.onload = async ()=>{
   await fetchUsers();
   await fetchPhim();
+  updateGenreOptions();
   renderPhim();
+  if (location.hash.startsWith("#id=")) {
+    let id = decodeURIComponent(location.hash.slice(4));
+    showPhim(encodeURIComponent(id));
+  }
 }
+window.addEventListener("hashchange", ()=>{
+  if (location.hash.startsWith("#id=")) {
+    let id = decodeURIComponent(location.hash.slice(4));
+    showPhim(encodeURIComponent(id));
+  } else {
+    closePlayer();
+  }
+});
+document.getElementById("genreFilter").addEventListener("change", renderPhim);
 </script>
 </body>
 </html>
