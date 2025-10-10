@@ -151,8 +151,15 @@ async function getGdPlayerProxyMp4(fileId){
 async function showPhim(_id){
   let m=phimList.find(m=>encodeURIComponent(m.id)===_id);
   if(!m) return showToast("Không tìm thấy phim!");
+  window.location.hash = "id=" + encodeURIComponent(m.id); // cập nhật URL phim riêng
   document.getElementById('playerTitle').innerText=m.title;
-  document.getElementById('playerFields').innerHTML=[`<div><b>Mô tả:</b> ${m.desc||''}</div>`,`<div><b>Năm:</b> ${m.year||''}</div>`,`<div><b>Thể loại:</b> ${m.genre||''}</div>`,m.cast?`<div><b>Diễn viên/Đạo diễn:</b> ${m.cast}</div>`:''].join('');
+  document.getElementById('playerFields').innerHTML=[
+    `<div><b>Mô tả:</b> ${m.desc||''}</div>`,
+    `<div><b>Năm:</b> ${m.year||''}</div>`,
+    `<div><b>Thể loại:</b> ${m.genre||''}</div>`,
+    m.cast?`<div><b>Diễn viên/Đạo diễn:</b> ${m.cast}</div>`:'',
+    m.drive?`<div><b>Link Google Drive:</b> <a href="${m.drive}" target="_blank" style="color:#ffe066;">Mở link gốc</a></div>`:''
+  ].join('');
   let fileId=extractFileId(m.drive),modal=document.querySelector('.modalDriveCustom'),plyrWrap=document.querySelector('.movie-player-plyr'),ifrWrap=document.querySelector('.movie-player-iframe'),plyr=document.getElementById('plyrVideo'),ifr=document.getElementById('driveFrame');plyrWrap.style.display=ifrWrap.style.display="none";
   if(m.special&&!loggedUser){showToast("Phim này yêu cầu đăng nhập.");closePlayer();showLogin();return;}
   document.getElementById('playerModal').style.display='flex';
@@ -168,8 +175,13 @@ async function showPhim(_id){
     }).catch(()=>{plyrWrap.style.display="none";ifrWrap.style.display="block";ifr.src=`https://drive.google.com/file/d/${fileId}/preview`;modal.classList.remove('show-plyr');modal.classList.add('show-drive');});
   }else{plyrWrap.style.display="none";ifrWrap.style.display="block";ifr.src=m.drive;modal.classList.remove('show-plyr');modal.classList.add('show-drive');}
 }
-function closePlayer(){document.getElementById('driveFrame').src='';if(window.playerPlyr)window.playerPlyr.pause();document.getElementById('playerModal').style.display='none';document.querySelector('.modalDriveCustom').classList.remove('show-drive','show-plyr');history.replaceState(null,null,window.location.pathname);}
-function copyPlayerLink(){let link=window.location.origin+window.location.pathname+location.hash;navigator.clipboard.writeText(link);showToast("Đã sao chép link phim: "+link);}
+function closePlayer(){
+  document.getElementById('driveFrame').src='';
+  if(window.playerPlyr)window.playerPlyr.pause();
+  document.getElementById('playerModal').style.display='none';
+  document.querySelector('.modalDriveCustom').classList.remove('show-drive','show-plyr');
+  history.replaceState(null,null,window.location.pathname); // Trả về trang chính
+}
 async function fetchPhim(){let url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_RANGE}?key=${API_KEY}`;let res=await fetch(url);let data=await res.json();let rows=data.values||[],header=rows[0];let idx=n=>header.findIndex(x=>x&&x.trim().toLowerCase()===n);phimList=rows.slice(1).map(row=>({title:row[idx('tên phim')]||'',desc:row[idx('mô tả')]||'',genre:row[idx('thể loại')]||'',year:row[idx('năm')]||'',id:row[idx('id')]||'',drive:row[idx('link google drive')]||'',poster:row[idx('link poster')]||'',special:(row[idx('special')]||'').trim().toLowerCase()==='yes',cast:row[idx('diễn viên/đạo diễn')]||'',isNew:row[idx('năm')]&&+row[idx('năm')]>=((new Date()).getFullYear()-1)})).filter(m=>m.title);genresSet=new Set(phimList.map(m=>m.genre).filter(g=>g&&g!==''));updateGenreOptions();renderPhim();renderSliderPreview();}
 function updateGenreOptions(){let sel=document.getElementById("genreFilter");sel.innerHTML=`<option value=\"\">Tất cả thể loại</option>${Array.from(genresSet).map(g=>`<option value=\"${g}\">${g}</option>`).join('')}`;}
 function renderPhim(){
@@ -194,21 +206,13 @@ window.onload=async()=>{
   document.getElementById('loginBtn').style.display="inline-block";
   document.getElementById('logoutBtn').style.display="none";
 }
-window.addEventListener("hashchange",()=>{if(location.hash.startsWith("#id=")){let id=decodeURIComponent(location.hash.slice(4));showPhim(encodeURIComponent(id));}else closePlayer();});
+window.addEventListener("hashchange",()=>{
+  if(location.hash.startsWith("#id=")){
+    let id=decodeURIComponent(location.hash.slice(4));showPhim(encodeURIComponent(id));
+  } else closePlayer();
+});
 document.getElementById("genreFilter").addEventListener("change",renderPhim);
 document.getElementById("quickSearch").addEventListener("input",()=>{renderPhim();});
-// Watermark động khi player modal mở
-let watermarkInterval=null;
-function moveWatermark(){const wm=document.querySelector('.watermark-logo');if(!wm)return;wm.style.right=(8+Math.random()*36)+'px';wm.style.bottom=(12+Math.random()*28)+'px';wm.style.opacity=(0.07+Math.random()*0.09).toFixed(2);}
-function startWatermark(){moveWatermark();watermarkInterval=setInterval(moveWatermark,2500);}
-function stopWatermark(){if(watermarkInterval)clearInterval(watermarkInterval);}
-document.getElementById('playerModal').addEventListener('shown',startWatermark);
-document.getElementById('playerModal').addEventListener('hidden',stopWatermark);
-// Keyboard shortcut Escape để đóng modal
-window.addEventListener('keydown',function(e){
-  if(document.getElementById('playerModal').style.display==='flex' && e.key==='Escape'){closePlayer();}
-  if(document.getElementById('loginModal').style.display==='flex' && e.key==='Escape'){closeLogin();}
-});
 </script>
 </body>
 </html>
