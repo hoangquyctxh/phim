@@ -7,7 +7,8 @@
   <meta name="description" content="Xem phim online chuyên nghiệp, an toàn, không tracking. Đăng nhập MovieHub trải nghiệm mượt trên mọi thiết bị.">
   <link rel="icon" type="image/png" href="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://user-gen-media-assets.s3.amazonaws.com; img-src * data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;"/>
+  <!-- Sửa CSP cho phép nhúng iframe từ Google Drive -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://user-gen-media-assets.s3.amazonaws.com; frame-src https://drive.google.com; img-src * data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;">
   <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
   <meta http-equiv="X-XSS-Protection" content="1; mode=block">
   <style>
@@ -113,14 +114,6 @@
     <button id="logoutBtn" class="logout" onclick="logoutApp()" style="display:none">Đăng xuất</button>
   </div>
 </header>
-<!-- Nếu thật sự CẦN banner quảng cáo, chỉ dùng banner TĨNH -->
-<!--
-<div class="banner-ads-moviehub">
-  <a href="http://ouo.io/ref/uX4ATbix" target="_blank" rel="noopener noreferrer">
-    <img src="http://ouo.io/images/banners/r2.jpg" alt="ouo.io - Banner quảng cáo an toàn" loading="lazy"/>
-  </a>
-</div>
--->
 <div class="container" role="main">
   <h2>Kho phim online - Xem phim theo đặc quyền tài khoản</h2>
   <div id="genreRows"></div>
