@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <title>MovieHub - Phim Google Drive Proxy Player</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Xem phim trên Google Drive siêu mượt, không giới hạn quota, giao diện đẹp, hiệu ứng hiện đại, bảo mật tuyệt đối.">
+  <meta name="description" content="Xem phim Google Drive proxy siêu mượt, không quota, code đẹp, hiệu ứng hiện đại, chuẩn app phim lớn.">
   <link rel="icon" type="image/png" href="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
@@ -16,10 +16,7 @@
     script-src 'self' 'unsafe-inline' https://cdn.plyr.io https://cdn.jsdelivr.net;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.plyr.io;">
   <style>
-    :root {
-      --bg-main: #181818; --bg-modal: #23222c; --txt-main: #fff;
-      --phim-card: #242333; --toolbar-title: #ffe066; --accent: #e50914; --accent2: #ffe066;
-    }
+    :root { --bg-main: #181818; --bg-modal: #23222c; --txt-main: #fff; --phim-card: #242333; --toolbar-title: #ffe066; --accent: #e50914; --accent2: #ffe066;}
     body { font-family:'Manrope',Arial,sans-serif;color:var(--txt-main);margin:0;background:linear-gradient(135deg,#23222e 60%,#222644 100%);}
     header{display:flex;align-items:center;gap:15px;padding:16px 8vw 14px 4vw;background:linear-gradient(93deg,#232335 83%,#301d34 101%);}
     .logo{height:40px;}
@@ -34,8 +31,7 @@
     h2{margin-top:38px;text-shadow:0 2px 11px #e509142a;font-size:clamp(1.30em,3vw,1.9em);font-weight:800;}
     .row-title{color:var(--accent2);font-size:1.16em;margin:38px 0 16px 9px;font-weight:800;text-shadow:0 3px 14px #e5091456;}
     .phimlist{display:flex;flex-wrap:wrap;gap:33px;}
-    .phimcard{
-      flex:0 0 216px;background:var(--phim-card);border-radius:22px;padding:0 0 14px 0;
+    .phimcard{flex:0 0 216px;background:var(--phim-card);border-radius:22px;padding:0 0 14px 0;
       box-shadow:0 4px 33px #15153b18,0 1px 10px #ffe06612;overflow:hidden;position:relative;margin-bottom:14px;
       transition:transform .22s,border .13s,box-shadow .23s cubic-bezier(.18,1.1,.41,.97);opacity:0;cursor:pointer;}
     .phimcard.appear{animation:flyIn 0.57s cubic-bezier(.23,.74,.42,1.11) forwards;}
@@ -58,12 +54,14 @@
     .modalDriveCustom.show-plyr .movie-player-plyr {display:block;}
     .modalDriveCustom.show-drive .movie-player-iframe {display:block;}
     .plyr {border-radius:18px;box-shadow:0 8px 38px #1e1c2a7c;background:#161932;}
-    @keyframes flyIn{0%{opacity:0;transform:translateY(46px) scale(.965);}100%{opacity:1;transform:translateY(0) scale(1);}}
-    @keyframes popModalIn{0%{opacity:0;transform:scale(.80) translateY(70px);}70%{opacity:.84;transform:scale(1.01) translateY(-8px);}100%{opacity:1;transform:scale(1) translateY(0);}}
     .footer-moviehub{background:linear-gradient(129deg,#23212e 84%,#181930 106%);color:#ffe4b0;text-align:center;padding:25px 6vw 15px 6vw;font-size:1.08em;margin-top:50px;}
     .footer-logo{height:43px;width:auto;display:inline-block;vertical-align:middle;opacity:.98;}
     .footer-content{text-align:left;min-width:180px;line-height:1.57;}
     @media (max-width:650px){.footer-moviehub{padding:13px 2vw 17px 2vw;}.footer-logo{height:31px;}}
+    @keyframes flyIn{0%{opacity:0;transform:translateY(46px) scale(.965);}100%{opacity:1;transform:translateY(0) scale(1);}}
+    @keyframes popModalIn{0%{opacity:0;transform:scale(.80) translateY(70px);}70%{opacity:.84;transform:scale(1.01) translateY(-8px);}100%{opacity:1;transform:scale(1) translateY(0);}}
+    /* Login modal demo (ẩn phần nếu chưa dùng) */
+    #loginModal{display:none}
   </style>
 </head>
 <body>
@@ -73,23 +71,31 @@
   <select id="genreFilter"><option value="">Tất cả thể loại</option></select>
   <button id="themeToggle" class="btn" onclick="toggleTheme()" aria-label="Đổi giao diện tối/sáng">🌙</button>
   <div class="right">
-    <button id="loginBtn" class="loginhdr btn" style="display:inline-block">Đăng nhập</button>
-    <button id="logoutBtn" class="logout" style="display:none">Đăng xuất</button>
+    <button id="loginBtn" class="loginhdr btn" onclick="showLogin()" style="display:inline-block">Đăng nhập</button>
+    <button id="logoutBtn" class="logout" onclick="logoutApp()" style="display:none">Đăng xuất</button>
   </div>
 </header>
 <div class="container" role="main">
-  <h2>Kho phim online - Hỗ trợ Google Drive, không giới hạn, giao diện điện ảnh</h2>
+  <h2>Kho phim online - Hỗ trợ Google Drive, không quota, giao diện điện ảnh, bảo mật tối ưu</h2>
   <div id="genreRows"></div>
 </div>
+<!-- Modal login demo (ẩn phần này nếu không cần đăng nhập dành cho thành viên đặc biệt) -->
+<div id="loginModal" class="modal" aria-modal="true" role="dialog">
+  <div class="modalDriveCustom" style="max-width:420px;background:#282137;box-shadow:0 6px 54px #000c;">
+    <button class="closebtn2" onclick="closeLogin()" aria-label="Đóng">&times;</button>
+    <div style="color:#ffe066;margin:12px 0 18px 0;font-size:1.09em;font-weight:700;">Đăng nhập quản trị/Thành viên</div>
+    <input id="loginUser" placeholder="Tài khoản..." style="margin-bottom:10px;width:96%;padding:9px;font-size:1em;" />
+    <input id="loginPass" type="password" placeholder="Mật khẩu..." style="margin-bottom:18px;width:96%;padding:9px;font-size:1em;"/>
+    <button class="btn" onclick="doLogin()" style="width:100%;">Đăng nhập</button>
+    <div class="errmsg" id="loginErr" style="display:none;margin-top:11px;color:#ee768b;font-size:.99em;"></div>
+  </div>
+</div>
+<!-- Player modal -->
 <div id="playerModal" class="modal" style="display:none;" aria-modal="true" role="dialog">
   <div class="modalDriveCustom" onclick="event.stopPropagation();" tabindex="0">
     <button class="closebtn2" onclick="closePlayer()" aria-label="Đóng player phim">&times;</button>
-    <div class="movie-player-plyr">
-      <video id="plyrVideo" playsinline controls poster="" style="width:100%;" crossorigin="anonymous"></video>
-    </div>
-    <div class="movie-player-iframe">
-      <iframe id="driveFrame" style="width:100%;aspect-ratio:16/9;min-height:210px;border-radius:18px;background:#000;border:none;"></iframe>
-    </div>
+    <div class="movie-player-plyr"><video id="plyrVideo" playsinline controls poster="" style="width:100%;" crossorigin="anonymous"></video></div>
+    <div class="movie-player-iframe"><iframe id="driveFrame" style="width:100%;aspect-ratio:16/9;min-height:210px;border-radius:18px;background:#000;border:none;"></iframe></div>
     <div class="player-toolbar">
       <span id="playerTitle" class="player-title">Tên phim</span>
       <button class="btnshare" onclick="copyPlayerLink()" data-tip="Dán ra bất kỳ đâu để chia sẻ!">📋 Sao chép link phim</button>
@@ -101,7 +107,7 @@
   <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png" alt="MovieHub Logo" class="footer-logo"/>
   <div class="footer-content">
     <b style="font-size:1.13em;">MovieHub</b><br>
-    Đăng ký tài khoản, hỗ trợ vấn đề liên quan...<br>
+    Đăng ký tài khoản, hỗ trợ...<br>
     Email: <a href="mailto:moviehub_vn@hotmail.com" style="color:#ffe066;text-decoration:underline;">moviehub_vn@hotmail.com</a>
   </div>
 </footer>
@@ -110,8 +116,36 @@
 const SHEET_ID = '15mFrve7Z-_zi_7AvSq3t9Nti1VjINVHCQDF7LRmP1QQ';
 const API_KEY = 'AIzaSyD5dWLgYZPu1_-AkwAaHPClGOOQ-Lq5EGI';
 const SHEET_RANGE = 'Sheet1!A1:Z';
-let phimList = [], genresSet = new Set(), loggedUser = false;
+let phimList = [], genresSet = new Set(), loggedUser = false, userList = [];
 
+// ==== ĐĂNG NHẬP demo (đơn giản, bỏ qua nếu không cần) ====
+function showLogin() {
+  document.getElementById('loginModal').style.display = "flex";
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginErr').style.display = 'none';
+}
+function closeLogin() { document.getElementById('loginModal').style.display = "none"; }
+function doLogin() {
+  let user = document.getElementById('loginUser').value.trim();
+  let pass = document.getElementById('loginPass').value.trim();
+  if (user === "admin" && pass === "123456") {
+    loggedUser = true;
+    closeLogin();
+    renderPhim();
+    alert("Đăng nhập thành công (admin demo)!");
+  } else {
+    document.getElementById('loginErr').innerText = "Sai tài khoản hoặc mật khẩu (thử admin/123456)";
+    document.getElementById('loginErr').style.display = "block";
+  }
+}
+function logoutApp() {
+  loggedUser = false;
+  renderPhim();
+  alert('Đã đăng xuất!');
+}
+
+// ==== GOOGLE DRIVE PROXY PLAYER ====
 function extractFileId(link) {
   let m = link.match(/file\/d\/([a-zA-Z0-9_-]+)/) || link.match(/[?&]id=([a-zA-Z0-9_-]+)/) || link.match(/^([a-zA-Z0-9_-]{25,})$/);
   return m ? m[1] : null;
