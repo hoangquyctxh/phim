@@ -230,7 +230,6 @@ async function showPhim(_id){
     `<div><b>Năm:</b> ${m.year||''}</div>`,
     `<div><b>Thể loại:</b> ${m.genre||''}</div>`,
     m.cast?`<div><b>Diễn viên/Đạo diễn:</b> ${m.cast}</div>`:'',
-    m.drive?`<div><b>Link Google Drive:</b> <a href="${m.drive}" target="_blank" style="color:#ffe066;">Mở link gốc</a></div>`:''
   ].join('');
   let fileId=extractFileId(m.drive),
   modal=document.querySelector('.modalDriveCustom'),
@@ -348,3 +347,4 @@ document.getElementById("quickSearch").addEventListener("input",()=>{renderPhim(
 </script>
 </body>
 </html>
+
