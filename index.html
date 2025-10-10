@@ -2,163 +2,104 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
+  <title>MovieHub - Phim trực tuyến an toàn, hiện đại, responsive</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MovieHub - Web phim hiện đại, an toàn, responsive</title>
-  <meta name="description" content="Xem phim online MovieHub bảo mật, nhanh, không tracking. Đăng nhập bằng tài khoản riêng cực kỳ an toàn và trải nghiệm mượt mọi thiết bị." />
+  <meta name="description" content="Xem phim online chuyên nghiệp, an toàn, không tracking. Đăng nhập MovieHub trải nghiệm mượt trên mọi thiết bị.">
   <link rel="icon" type="image/png" href="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://user-gen-media-assets.s3.amazonaws.com; img-src * data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;"/>
+  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
   <style>
     :root {
-      --bg-main: #181818; --bg-modal: #212126;
+      --bg-main: #181818; --bg-modal: #232226;
       --txt-main: #fff; --phim-card: #222; --toolbar-title: #ffe066;
-      --accent: #e50914; --accent2: #ffe066;
+      --accent: #e50914;
+      --accent2: #ffe066;
     }
     body.lightmode {
-      --bg-main: #f5f6fa; --bg-modal: #fffbea;
+      --bg-main: #f6f7fa; --bg-modal: #fffbea;
       --txt-main: #222; --phim-card: #fff; --toolbar-title: #de771a;
     }
-    html, body{background:var(--bg-main);}
-    body {
-      color:var(--txt-main);font-family:'Inter', 'Segoe UI', Arial,sans-serif;margin:0;
-      transition:background .33s,color .25s cubic-bezier(.35,1.5,.68,1);min-height:100vh;
-    }
-    header {display:flex;align-items:center;gap:13px;padding:12px 8vw 13px 4vw;background:#23222e;}
-    .logo {height:38px;}
-    .title {font-size:2em;color:var(--accent);font-weight:700;margin-left:3px;font-family:'Inter',sans-serif;letter-spacing:.01em;}
-    .right {margin-left:auto;display:flex;gap:16px;align-items:center;}
-    .btn {padding:9px 21px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-weight:600;cursor:pointer;transition:background .15s,transform .09s;}
-    .btn:hover {background:#aa0814;}
-    .btn:active {transform:scale(.95);}
-    .logout, .loginhdr {background:transparent;color:var(--accent2);border:none;font-size:1em;}
-    .logout:hover, .loginhdr:hover {color:var(--accent);}
-    #genreFilter {padding:8px 13px;font-size:1em;border-radius:7px;background:#262626;color:var(--accent2);border:none;}
+    html,body{background:var(--bg-main);}
+    body{color:var(--txt-main);font-family:'Inter',Arial,sans-serif;margin:0;transition:background .3s,color .2s;}
+    header{display:flex;align-items:center;gap:14px;padding:13px 8vw 13px 4vw;background:#23222e;}
+    .logo{height:37px;}
+    .title{font-size:clamp(1.23em,3vw,2em);color:var(--accent);font-weight:700;margin-left:3px;font-family:'Inter',sans-serif;}
+    .right{margin-left:auto;display:flex;gap:16px;align-items:center;}
+    .btn{padding:9px 21px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-weight:600;cursor:pointer;transition:background .15s,transform .09s;}
+    .btn:hover{background:#aa0814;}
+    .btn:active{transform:scale(.95);}
+    .logout,.loginhdr{background:transparent;color:var(--accent2);border:none;font-size:1em;}
+    .logout:hover,.loginhdr:hover{color:var(--accent);}
+    #genreFilter{padding:8px 13px;font-size:1em;border-radius:7px;background:#262626;color:var(--accent2);border:none;}
     #themeToggle{margin-left:14px;padding:7px 15px;min-width:38px;}
-    /* Banner quảng cáo */
-    .banner-ads-moviehub {
-      text-align:center;margin:2px 0 19px 0;display:block;width:100%;
-      background:#232323;border-bottom:2px solid #181818;box-shadow:0 8px 32px #0004,0 2px 16px #ffe06615;
-    }
-    .banner-ads-moviehub img {
-      max-width:99vw;height:auto;margin:0 auto;display:inline-block;border-radius:13px;box-shadow:0 4px 22px #0003;max-height:68px;
-    }
-    .container {max-width:1040px;margin:0 auto;padding:27px 7vw 70px 7vw;}
-    h2 {margin-top:40px;text-shadow:0 2px 6px #0009;}
-    .row-title {color:var(--accent2);font-size:1.11em;margin:40px 0 16px 7px;font-weight:700;text-shadow:0 2.5px 13px #e5091459, 0 1px 10px #ffe06644;}
-    .phimlist {display:flex;flex-wrap:wrap;gap:32px;}
-    .phimcard {
-      flex:0 0 210px;background:var(--phim-card);border-radius:19px;padding:0 0 14px 0;
+    .container{max-width:1040px;margin:0 auto;padding:27px 7vw 70px 7vw;}
+    h2{margin-top:38px;text-shadow:0 2px 6px #000a;font-size:clamp(1.22em,3vw,1.8em);}
+    .row-title{color:var(--accent2);font-size:1.11em;margin:34px 0 16px 7px;font-weight:700;text-shadow:0 2.5px 13px #e5091459,0 1px 10px #ffe06644;}
+    .phimlist{display:flex;flex-wrap:wrap;gap:31px;}
+    .phimcard{
+      flex:0 0 210px;background:var(--phim-card);border-radius:18px;padding:0 0 14px 0;
       box-shadow:0 3px 30px #1118;overflow:hidden;position:relative;margin-bottom:14px;
-      transition: transform .19s,border .13s,box-shadow .21s cubic-bezier(.19,1.45,.68,1.12);opacity:0;
+      transition:transform .18s,border .13s,box-shadow .21s cubic-bezier(.19,1.45,.68,1.12);opacity:0;
     }
-    .phimcard.appear {animation:flyIn 0.62s cubic-bezier(.28,.61,.48,1.09) forwards;}
-    .phimcard:hover {
-      transform: scale(1.05) translateY(-6px);
-      box-shadow: 0 16px 44px #e5091427, 0 1px 12px #ffe06629;
-      border: 1.5px solid #ffe06644;
-      z-index:2;
-    }
-    @keyframes flyIn {
-      0%{opacity:0;transform:translateY(38px) scale(.99);}
-      100%{opacity:1;transform:translateY(0) scale(1);}
-    }
-    .phimimg {width:100%;aspect-ratio:2/3;object-fit:cover;border-bottom:2px solid #262626;}
-    .phimtitle{font-size:1.09em;margin:12px 15px 6px 15px;font-weight:700;}
+    .phimcard.appear{animation:flyIn 0.61s cubic-bezier(.28,.61,.48,1.09) forwards;}
+    .phimcard:hover{transform:scale(1.045) translateY(-5px);box-shadow:0 16px 44px #e5091427,0 1px 12px #ffe06629;border:1.5px solid #ffe06645;z-index:2;}
+    @keyframes flyIn{0%{opacity:0;transform:translateY(38px) scale(.99);}100%{opacity:1;transform:translateY(0) scale(1);}}
+    .phimimg{width:100%;aspect-ratio:2/3;object-fit:cover;border-bottom:2px solid #262626;}
+    .phimtitle{font-size:1.08em;margin:12px 15px 6px 15px;font-weight:700;}
     .phimmeta{font-size:.99em;color:var(--accent2);padding:0 15px;}
-    .badge-new{display:inline-block;background:var(--accent);color:#fff;padding:2px 13px;font-size:.97em;border-radius:8px;margin:8px 0 0 13px;
-      box-shadow:0 0 13px #ffe066cc,0 1px 8px #e5091440; text-shadow:0 1px 5px #e50914aa;}
+    .badge-new{display:inline-block;background:var(--accent);color:#fff;padding:2px 13px;font-size:.97em;border-radius:8px;margin:8px 0 0 13px;box-shadow:0 0 13px #ffe066cc,0 1px 8px #e5091440;}
     .badge-locked{background:#bbb;color:#222;padding:2px 12px;border-radius:9px;font-size:.99em;position:absolute;top:11px;right:13px;}
     .watchbtn{margin:15px 0 0 15px;padding:8px 21px;font-size:1.07em;}
     .watchbtn.locked{background:#666;color:#ccc;}
     .modal{position:fixed;inset:0;background:#101826cc;backdrop-filter:blur(6px) brightness(.96);display:flex;align-items:center;justify-content:center;z-index:9999;}
-    .modalDriveCustom {
-      background: linear-gradient(134deg, var(--bg-modal) 70%, #19181d 100%);
-      border-radius: 22px; box-shadow:0 8px 56px #000f,0 1px 0 #333b;
-      padding:29px 22px 27px 22px; min-width:300px; width:97vw; max-width:640px; 
-      position:relative; color:var(--txt-main);
-      animation:fadeIn .44s; max-height:90vh; display:flex; flex-direction:column;overflow-y:auto;transition:background .27s;
+    .modalDriveCustom{
+      background:linear-gradient(134deg,var(--bg-modal) 74%,#19181d 100%);
+      border-radius:21px;box-shadow:0 8px 56px #000e,0 1px 0 #333c;
+      padding:26px 22px 22px 22px;min-width:300px;width:97vw;max-width:640px;position:relative;animation:fadeIn .44s;max-height:91vh;display:flex;flex-direction:column;overflow-y:auto;transition:background .27s;
     }
-    /* LOGIN MOVIEHUB STYLE */
-    .login-box-moviehub {
-      position:relative; width:370px; max-width:97vw; margin:auto;
-      background:linear-gradient(134deg,#23212e 75%,#19181f 100%);
-      border-radius:25px; box-shadow:0 8px 48px #000d;
-      padding:43px 32px 30px 32px; color:#fff;
-      display:flex; flex-direction:column; align-items:center; animation:fadeIn .38s; margin-top:8vh;
+    .login-box-moviehub{
+      position:relative;width:370px;max-width:97vw;margin:auto;
+      background:linear-gradient(134deg,#23212e 75%,#19171f 100%);
+      border-radius:24px;box-shadow:0 8px 48px #000e;padding:42px 32px 27px 32px;color:#fff;display:flex;flex-direction:column;align-items:center;animation:fadeIn .37s;margin-top:7vh;
     }
-    .login-logo {height:58px; margin-bottom:7px; opacity:.97;}
-    .login-box-moviehub h3{margin:19px 0 13px 0;font-size:1.36em;font-weight:700;letter-spacing:.2px;}
+    .login-logo{height:58px;margin-bottom:7px;opacity:.97;}
+    .login-box-moviehub h3{margin:17px 0 12px 0;font-size:1.31em;font-weight:700;letter-spacing:.2px;}
     .login-box-moviehub form{width:100%;display:flex;flex-direction:column;gap:8px;}
     .login-box-moviehub label{font-size:1em;color:var(--accent2);margin-bottom:4px;margin-top:9px;}
     .login-box-moviehub input{
       padding:10px;font-size:1em;border-radius:9px;border:none;background:#21223a;color:#fff;
-      margin-bottom:3px;box-shadow:0 1.5px 6px #29292912;outline:none;transition:box-shadow .16s;}
+      margin-bottom:3px;box-shadow:0 1.5px 6px #29292913;outline:none;transition:box-shadow .15s;}
     .login-box-moviehub input:focus{box-shadow:0 1.5px 18px #ffe06650;}
-    .loginbtn {
-      width:100%;margin-top:18px;font-size:1.09em;letter-spacing:.5px;text-transform:uppercase;
-      font-weight:700; box-shadow:0 2px 8px #ffe06617;
-      background:linear-gradient(93deg,var(--accent) 70%,var(--accent2) 180%);
-      color:#fff;
-    }
-    .loginbtn:active {background:#aa0818;}
-    .closebtn{position:absolute;top:12px;right:15px;background:var(--accent);color:#fff;border:none;
-      border-radius:15px;padding:7px 13px;font-size:1.3em;cursor:pointer;font-weight:700;}
+    .loginbtn{width:100%;margin-top:17px;font-size:1.09em;letter-spacing:.5px;text-transform:uppercase;font-weight:700;box-shadow:0 2px 8px #ffe06617;background:linear-gradient(93deg,var(--accent) 70%,var(--accent2) 180%);color:#fff;}
+    .loginbtn:active{background:#aa0818;}
+    .closebtn{position:absolute;top:12px;right:15px;background:var(--accent);color:#fff;border:none;border-radius:15px;padding:7px 13px;font-size:1.3em;cursor:pointer;font-weight:700;}
     .closebtn:hover{background:#bb0712;}
-    .login-links{
-      width:100%;text-align:center;margin:18px 0 5px 0;font-size:.98em;color:#ffe066d4;display:flex;gap:9px;justify-content:center;}
+    .login-links{width:100%;text-align:center;margin:16px 0 5px 0;font-size:.98em;color:#ffe066d4;display:flex;gap:9px;justify-content:center;}
     .login-links a{color:var(--accent2);text-decoration:underline;cursor:pointer;font-weight:600;}
-    .login-links a:hover{color:#ff9a00}
-    .login-info{margin-top:13px;color:#ffe066b8;font-size:.98em;text-align:center;}
-    @media (max-width:520px){.login-box-moviehub{padding:18px 7vw;min-width:97vw;width:99vw;}}
-    .player-drive-wrap{ width:100%; background:#111; border-radius:19px;overflow:hidden;box-shadow:0 6px 48px #0008;position:relative;}
-    .player-toolbar{
-      display:flex;flex-direction:row;align-items:center;justify-content:space-between;
-      margin-top:8px;padding:11px 0 0 0;
-    }
+    .login-links a:hover{color:#ff9a00;}
+    .login-info{margin-top:12px;color:#ffe066b8;font-size:.98em;text-align:center;}
+    .player-drive-wrap{width:100%;background:#111;border-radius:19px;overflow:hidden;box-shadow:0 6px 48px #0008;position:relative;}
+    .player-toolbar{display:flex;flex-direction:row;align-items:center;justify-content:space-between;margin-top:8px;padding:11px 0 0 0;}
     .player-title{font-size:1.16em;font-weight:700;line-height:1.4;color:var(--toolbar-title);}
     .btnshare{padding:7px 16px;border-radius:10px;background:var(--accent2);color:#222;font-weight:600;border:none;font-size:.99em;cursor:pointer;position:relative;}
     .btnshare:hover{background:#ffc800;}
-    .btnshare[data-tip]:hover:after{
-      content: attr(data-tip);
-      position:absolute;top:-37px;right:-4px; background:#242bca;color:#ffe066;padding:4px 18px;border-radius:8px;
-      font-size:0.97em;white-space:nowrap;z-index:12;box-shadow: 0 3px 11px #0004;opacity:1;pointer-events:none;
-      filter:drop-shadow(0 2px 8px #0008);font-style:italic;
-    }
-    #playerDesc.player-desc{margin-top:12px;font-size:.99em;line-height:1.51;color:#ffd;max-height:180px;overflow-y:auto;margin-bottom:2px;padding-right:4px;transition:background .19s;}
-    @media (max-width:800px){#playerDesc.player-desc{max-height:29vw;}}
+    .btnshare[data-tip]:hover:after{content:attr(data-tip);position:absolute;top:-37px;right:-4px;background:#242bca;color:#ffe066;padding:4px 18px;border-radius:8px;font-size:0.97em;white-space:nowrap;z-index:12;box-shadow:0 3px 11px #0004;opacity:1;pointer-events:none;}
+    #playerDesc.player-desc{margin-top:12px;font-size:.99em;line-height:1.51;color:#ffd;max-height:180px;overflow-y:auto;margin-bottom:2px;padding-right:4px;}
     .closebtn2{background:var(--accent);color:#fff;border:none;border-radius:13px;padding:8px 13px;font-size:1.34em;cursor:pointer;font-weight:700;position:absolute;right:14px;top:11px;}
     .closebtn2:hover{background:#be0009;}
     @keyframes fadeIn{0%{opacity:0;transform:scale(.91);}50%{opacity:.75;}100%{opacity:1;transform:scale(1);}}
-    .player-watermark {
-      position:absolute;bottom:13px;right:18px;opacity:.08;pointer-events:none;z-index:3;
-      height:54px;width:auto;max-width:20vw;filter:drop-shadow(0 2px 10px #181b);user-select:none;
-    }
+    .player-watermark{position:absolute;bottom:13px;right:18px;opacity:.08;pointer-events:none;z-index:3;height:54px;width:auto;max-width:20vw;filter:drop-shadow(0 2px 10px #181b);}
     @media (max-width:600px){.player-watermark{height:32px;right:7px;bottom:6px;max-width:36vw;}}
-    /* FOOTER CONTACT */
-    .footer-moviehub {
-      background:linear-gradient(133deg,#23212e 75%,#181930 100%);
-      color:#ffe4b0;text-align:center;padding:25px 6vw 15px 6vw;
-      font-size:1.07em; margin-top:55px;box-shadow:0 -1px 12px #07081c20;
-    }
-    .footer-wrap {display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;}
-    .footer-logo {
-      height:48px;width:auto;display:inline-block;vertical-align:middle;opacity:.98;filter:drop-shadow(0 1px 9px #ffe06640);border-radius:10px;
-    }
-    .footer-content {text-align:left;min-width:180px;line-height:1.56;}
-    @media (max-width:650px){
-      .footer-wrap{flex-direction:column;gap:9px;}
-      .footer-moviehub{padding:16px 2vw 19px 2vw;}
-      .footer-logo{height:36px;}
-    }
-    @media (max-width:730px){
-      .container{padding:12px 2vw 60px 2vw;}
-      .phimlist{gap:12vw;}
-      .phimcard{flex-basis:47vw;max-width:97vw;}
-      header {flex-direction:column;align-items:flex-start;gap:8px;}
-    }
-    /* A11y and base: */
-    .btn, .loginbtn, .closebtn, .closebtn2{outline:none;}
-    .btn:focus, .watchbtn:focus, .loginbtn:focus, input:focus, select:focus{box-shadow:0 0 0 2px #ffe06696;}
+    .footer-moviehub{background:linear-gradient(130deg,#23212e 80%,#181930 100%);color:#ffe4b0;text-align:center;padding:22px 6vw 14px 6vw;font-size:1.07em;margin-top:55px;box-shadow:0 -1px 12px #07081c20;}
+    .footer-wrap{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;}
+    .footer-logo{height:46px;width:auto;display:inline-block;vertical-align:middle;opacity:.98;filter:drop-shadow(0 1px 9px #ffe06640);}
+    .footer-content{text-align:left;min-width:180px;line-height:1.57;}
+    @media (max-width:650px){.footer-wrap{flex-direction:column;gap:9px;}.footer-moviehub{padding:13px 2vw 17px 2vw;}.footer-logo{height:32px;}}
+    @media (max-width:730px){.container{padding:11px 2vw 51px 2vw;}.phimlist{gap:11vw;}.phimcard{flex-basis:47vw;max-width:97vw;}header{flex-direction:column;align-items:flex-start;gap:7px;}}
+    .btn,.loginbtn,.closebtn,.closebtn2{outline:none;}
+    .btn:focus,.watchbtn:focus,.loginbtn:focus,input:focus,select:focus{box-shadow:0 0 0 2px #ffe06696;}
   </style>
 </head>
 <body>
@@ -166,17 +107,20 @@
   <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png" class="logo" alt="MovieHub"/>
   <span class="title">MovieHub</span>
   <select id="genreFilter"><option value="">Tất cả thể loại</option></select>
-  <button id="themeToggle" class="btn" onclick="toggleTheme()" aria-label="Đổi giao diện tối/sáng" style="margin-left:14px;">🌙</button>
+  <button id="themeToggle" class="btn" onclick="toggleTheme()" aria-label="Đổi giao diện tối/sáng">🌙</button>
   <div class="right">
     <button id="loginBtn" class="loginhdr btn" onclick="showLogin()" style="display:inline-block">Đăng nhập</button>
     <button id="logoutBtn" class="logout" onclick="logoutApp()" style="display:none">Đăng xuất</button>
   </div>
 </header>
+<!-- Nếu thật sự CẦN banner quảng cáo, chỉ dùng banner TĨNH -->
+<!--
 <div class="banner-ads-moviehub">
-  <a href="http://ouo.io/ref/uX4ATbix" target="_blank" rel="noopener">
-    <img src="http://ouo.io/images/banners/r2.jpg" alt="ouo.io - Banner quảng cáo an toàn" />
+  <a href="http://ouo.io/ref/uX4ATbix" target="_blank" rel="noopener noreferrer">
+    <img src="http://ouo.io/images/banners/r2.jpg" alt="ouo.io - Banner quảng cáo an toàn" loading="lazy"/>
   </a>
 </div>
+-->
 <div class="container" role="main">
   <h2>Kho phim online - Xem phim theo đặc quyền tài khoản</h2>
   <div id="genreRows"></div>
@@ -331,7 +275,7 @@ function showLogin(){
   document.getElementById('loginUser').value = '';
   document.getElementById('loginPass').value = '';
   document.getElementById('loginErr').style.display = 'none';
-  setTimeout(()=>document.getElementById('loginUser').focus(),100);
+  setTimeout(()=>document.getElementById('loginUser').focus(),120);
 }
 function closeLogin(){
   document.getElementById('loginModal').style.display='none';
