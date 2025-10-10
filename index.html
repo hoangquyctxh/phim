@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
-  <title>MovieHub - Web phim hiệu ứng mượt nhất</title>
+  <title>MovieHub - Giao diện đăng nhập chuyên nghiệp</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     :root {
@@ -40,7 +40,7 @@
       animation:flyIn 0.63s cubic-bezier(.25,.62,.42,1) forwards;
     }
     .phimcard:hover {
-      transform: scale(1.045) translateY(-7px);
+      transform: scale(1.047) translateY(-7px);
       box-shadow: 0 16px 44px #e509142b, 0 1px 9px #fff8;
       z-index:5;
       border: 1.5px solid #ffe06644;
@@ -66,7 +66,38 @@
       position:relative; color:var(--txt-main);
       animation:fadeIn .5s; max-height:90vh; display:flex; flex-direction:column;overflow-y:auto;transition:background .27s;
     }
-    @media (max-width:900px){.modalDriveCustom{max-width:99vw;padding:13px 1vw 20px 1vw;}}
+    /* LOGIN MODERN MOVIEHUB STYLE */
+    .login-box-moviehub {
+      position:relative; width:370px; max-width:97vw; margin:auto;
+      background:linear-gradient(134deg,#23212e 75%,#19171f 100%);
+      border-radius:24px; box-shadow:0 8px 48px #000d;
+      padding:43px 32px 30px 32px; color:#fff;
+      display:flex; flex-direction:column; align-items:center; animation:fadeIn .42s; margin-top:8vh;
+    }
+    .login-logo {height:58px; margin-bottom:7px; opacity:.97;}
+    .login-box-moviehub h3{margin:18px 0 13px 0;font-size:1.35em;font-weight:700;letter-spacing:.2px;}
+    .login-box-moviehub form{width:100%;display:flex;flex-direction:column;gap:8px;}
+    .login-box-moviehub label{font-size:1em;color:#ffe066;margin-bottom:4px;margin-top:9px;}
+    .login-box-moviehub input{
+      padding:10px;font-size:1em;border-radius:9px;border:none;background:#21223a;color:#fff;
+      margin-bottom:3px;box-shadow:0 1px 6px #29292914;outline:none;transition:box-shadow .16s;}
+    .login-box-moviehub input:focus{box-shadow:0 1px 18px #ffe06666;}
+    .loginbtn {
+      width:100%;margin-top:18px;font-size:1.09em;letter-spacing:.5px;text-transform:uppercase;
+      font-weight:700; box-shadow:0 2px 8px #ffe06618;
+      background:linear-gradient(93deg,#e50914 70%,#ffe066 180%);
+      color:#fff;
+    }
+    .loginbtn:active {background:#aa0818;}
+    .closebtn{position:absolute;top:12px;right:15px;background:#e50914;color:#fff;border:none;
+      border-radius:15px;padding:7px 13px;font-size:1.3em;cursor:pointer;font-weight:700;}
+    .closebtn:hover{background:#bb0712;}
+    .login-links{
+      width:100%;text-align:center;margin:18px 0 5px 0;font-size:.98em;color:#ffe066d4;display:flex;gap:9px;justify-content:center;}
+    .login-links a{color:#ffe066;text-decoration:underline;cursor:pointer;font-weight:600;}
+    .login-links a:hover{color:#ff9a00}
+    .login-info{margin-top:13px;color:#ffe066ad;font-size:.97em;text-align:center;}
+    @media (max-width:520px){.login-box-moviehub{padding:18px 7vw;min-width:97vw;width:99vw;}}
     .player-drive-wrap{ width:100%; background:#111; border-radius:19px;overflow:hidden;box-shadow:0 6px 48px #0008;position:relative;}
     .player-toolbar{
       display:flex;flex-direction:row;align-items:center;justify-content:space-between;
@@ -78,15 +109,13 @@
     .btnshare[data-tip]:hover:after{
       content: attr(data-tip);
       position:absolute;top:-37px;right:-4px; background:#242bca;color:#ffe066;padding:4px 18px;border-radius:8px;
-      font-size:0.97em;white-space:nowrap;z-index:12;box-shadow: 0 3px 11px #0004;opacity:1;
-      pointer-events:none;
-      filter:drop-shadow(0 2px 6px #0008);
-      font-style:italic;
+      font-size:0.97em;white-space:nowrap;z-index:12;box-shadow: 0 3px 11px #0004;opacity:1;pointer-events:none;
+      filter:drop-shadow(0 2px 6px #0008);font-style:italic;
     }
     #playerDesc.player-desc{margin-top:12px;font-size:.99em;line-height:1.51;color:#ffd;max-height:180px;overflow-y:auto;margin-bottom:2px;padding-right:4px;transition:background .2s;}
     @media (max-width:800px){#playerDesc.player-desc{max-height:29vw;}}
-    .closebtn{background:#e50914;color:#fff;border:none;border-radius:13px;padding:8px 13px;font-size:1.34em;cursor:pointer;font-weight:700;position:absolute;right:14px;top:11px;}
-    .closebtn:hover{background:#be0009;}
+    .closebtn2{background:#e50914;color:#fff;border:none;border-radius:13px;padding:8px 13px;font-size:1.34em;cursor:pointer;font-weight:700;position:absolute;right:14px;top:11px;}
+    .closebtn2:hover{background:#be0009;}
     @keyframes fadeIn{0%{opacity:0;transform:scale(.91);}50%{opacity:.75;}100%{opacity:1;transform:scale(1);}}
     .player-watermark {
       position:absolute;bottom:13px;right:18px;opacity:.08;pointer-events:none;z-index:3;
@@ -117,20 +146,29 @@
   <div id="genreRows"></div>
 </div>
 <div id="loginModal" class="modal" style="display:none;">
-  <div class="modalDriveCustom">
-    <button class="closebtn" onclick="closeLogin()">&times;</button>
+  <div class="login-box-moviehub">
+    <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png" class="login-logo" alt="MovieHub Logo">
     <h3>Đăng nhập MovieHub</h3>
-    <label>Tài khoản:</label>
-    <input type="text" id="loginUser" autocomplete="username">
-    <label>Mật khẩu:</label>
-    <input type="password" id="loginPass" autocomplete="current-password">
-    <div class="errmsg" id="loginErr" style="display:none"></div>
-    <button class="btn" onclick="doLogin()">Đăng nhập</button>
+    <form onsubmit="doLogin();return false">
+      <label for="loginUser">Tài khoản</label>
+      <input id="loginUser" autocomplete="username" placeholder="Email/Tài khoản..." />
+      <label for="loginPass">Mật khẩu</label>
+      <input type="password" id="loginPass" autocomplete="current-password" placeholder="••••••••" />
+      <button type="submit" class="btn loginbtn">Đăng nhập</button>
+    </form>
+    <div class="errmsg" id="loginErr" style="display:none;margin-top:7px;"></div>
+    <div class="login-links">
+      <a href="#" onclick="alert('Liên hệ admin để lấy/mở lại mật khẩu!')">Quên mật khẩu?</a>
+      <span>·</span>
+      <a href="#" onclick="alert('Tính năng Đăng ký sẽ sớm có!')">Đăng ký tài khoản mới</a>
+    </div>
+    <button class="closebtn" onclick="closeLogin()">&times;</button>
+    <div class="login-info">Đăng nhập để xem toàn bộ phim và lưu lịch sử cá nhân.</div>
   </div>
 </div>
 <div id="playerModal" class="modal" style="display:none;" ondblclick="if(event.target===this)closePlayer()">
   <div class="modalDriveCustom" onclick="event.stopPropagation();">
-    <button class="closebtn" onclick="closePlayer()">&times;</button>
+    <button class="closebtn2" onclick="closePlayer()">&times;</button>
     <div class="player-drive-wrap">
       <iframe id="driveFrame" src="" allowfullscreen allow="autoplay"
         style="width:100%;aspect-ratio:16/9;min-height:190px;border-radius:19px;box-shadow:0 6px 48px #000d;background:#0a0a0a;"></iframe>
