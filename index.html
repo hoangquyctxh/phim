@@ -7,16 +7,21 @@
   <meta name="description" content="Xem phim online chuyên nghiệp, an toàn, không tracking. Đăng nhập MovieHub trải nghiệm mượt trên mọi thiết bị.">
   <link rel="icon" type="image/png" href="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-  <!-- Sửa CSP cho phép nhúng iframe từ Google Drive -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://user-gen-media-assets.s3.amazonaws.com; frame-src https://drive.google.com; img-src * data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;">
+  <!-- ĐÃ SỬA: CSP nới đúng cho Google Sheets API + Google Drive -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://user-gen-media-assets.s3.amazonaws.com;
+    frame-src https://drive.google.com;
+    connect-src https://sheets.googleapis.com;
+    img-src * data:;
+    script-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;">
   <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
   <meta http-equiv="X-XSS-Protection" content="1; mode=block">
   <style>
     :root {
       --bg-main: #181818; --bg-modal: #232226;
       --txt-main: #fff; --phim-card: #222; --toolbar-title: #ffe066;
-      --accent: #e50914;
-      --accent2: #ffe066;
+      --accent: #e50914; --accent2: #ffe066;
     }
     body.lightmode {
       --bg-main: #f6f7fa; --bg-modal: #fffbea;
