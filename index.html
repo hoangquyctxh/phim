@@ -2,52 +2,71 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
-  <title>MovieHub - Proxy Google Drive Full Player</title>
+  <title>MovieHub - Google Drive Proxy, UI Cao cấp, Secure & Responsive</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+  <meta name="description" content="Web phim proxy Google Drive chuẩn quốc tế: bảo mật, tốc độ, giao diện đẹp, mobile-first, code tối ưu.">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css"/>
   <style>
-    body{font-family:'Manrope',Arial,sans-serif;color:#fff;background:linear-gradient(135deg,#23222e 60%,#222644 100%);margin:0;}
-    header{display:flex;align-items:center;gap:15px;padding:16px 8vw 14px 4vw;background:linear-gradient(93deg,#232335 83%,#301d34 101%);}
+    html,body{background:var(--bg-main);}
+    :root { --bg-main: #131625; --bg-modal: #23222c; --txt-main: #fff;
+      --phim-card: #252a38; --toolbar-title: #f7e47b; --accent: #e50914; --accent2: #ffe066;}
+    body {font-family: 'Manrope','Arial',sans-serif; color:var(--txt-main); margin:0; font-size:17px;}
+    header{display:flex;align-items:center;gap:15px;padding:16px 4vw;background:linear-gradient(93deg,#232335 83%,#301d34 101%);}
     .logo{height:40px;}
-    .title{font-size:clamp(1.32em,3vw,2.20em);color:#e50914;font-weight:800;margin-left:2px;text-shadow:0 2px 14px #e5091451;}
+    .title{font-size:clamp(1.32em,3vw,2.15em);color:var(--accent);font-weight:800;margin-left:2px;text-shadow:0 2px 14px #e5091441;}
     .right{margin-left:auto;display:flex;gap:15px;align-items:center;}
-    .btn{padding:10px 21px;border:none;border-radius:9px;background:#e50914;color:#fff;font-weight:800;cursor:pointer;}
-    #genreFilter{padding:8px 13px;font-size:1em;border-radius:7px;background:#28223c;color:#ffe066;}
-    #themeToggle{margin-left:14px;padding:8px 16px;}
-    .container{max-width:1100px;margin:0 auto;padding:28px 7vw 70px 7vw;}
-    h2{margin-top:38px;text-shadow:0 2px 11px #e509142a;font-size:clamp(1.3em,3vw,1.9em);font-weight:800;}
-    .row-title{color:#ffe066;font-size:1.15em;margin:33px 0 17px 9px;font-weight:800;text-shadow:0 2px 13px #e509144c;}
-    .phimlist{display:flex;flex-wrap:wrap;gap:25px;}
-    .phimcard{background:#222b3c;border-radius:19px;padding:0 0 12px 0;box-shadow:0 4px 20px #15153b20;position:relative;margin-bottom:14px;min-width:230px;max-width:340px;flex:1 1 285px;transition:.18s;opacity:0;}
-    .phimcard.appear{animation:flyIn 0.6s cubic-bezier(.23,.74,.42,1.11) forwards;}
-    .phimcard:hover{transform:scale(1.08) translateY(-10px);box-shadow:0 16px 33px #e5091460;}
+    .btn, .btnshare{padding:9px 18px;border:none;border-radius:9px;background:var(--accent);color:#fff;font-weight:800;cursor:pointer;box-shadow:0 6px 22px #e5091423;font-size:1em;}
+    .btn:hover,.btnshare:hover{background:#bb0917;}
+    .btn:active{transform:scale(.98);}
+    #genreFilter{padding:8px 13px;font-size:1em;border-radius:7px;background:#28223c;color:var(--accent2);}
+    #themeToggle{margin-left:14px;padding:8px 14px;}
+    .container{max-width:1150px;margin:0 auto;padding:27px 4vw 70px 4vw;}
+    h2{margin:40px 0 30px 0;text-shadow:0 2px 13px #e5091432;font-size:clamp(1.27em,3vw,2em);font-weight:800;}
+    .row-title{color:var(--accent2);font-size:1.11em;margin:34px 0 18px 9px;font-weight:800;text-shadow:0 2px 13px #e509144c;}
+    .phimlist{display:flex;flex-wrap:wrap;gap:23px;justify-content:center;}
+    .phimcard{background:var(--phim-card);border-radius:22px;padding:0 0 14px 0;box-shadow:0 4px 27px #15153b24;overflow:hidden;position:relative;margin-bottom:15px;min-width:210px;max-width:335px;flex:1 1 285px;transition:.17s;opacity:0;cursor:pointer;border:2.2px solid transparent;}
+    .phimcard.appear{animation:flyIn .56s cubic-bezier(.23,.74,.42,1.11) forwards;}
+    .phimcard:hover{transform:scale(1.05) translateY(-12px);box-shadow:0 19px 45px #e5091421,0 1px 27px #ffe06633;border:2.2px solid var(--accent2);}
     .phimimg{width:100%;aspect-ratio:2/3;object-fit:cover;}
-    .phimtitle{font-size:1.16em;margin:12px 14px 3px 14px;font-weight:800;}
-    .badge-new{display:inline-block;background:#e50914;color:#fff;padding:2px 13px;border-radius:8px;margin:8px 0 0 14px;}
-    .badge-locked{background:#aabbc7;color:#173;padding:2px 12px;border-radius:8px;font-size:.98em;position:absolute;top:11px;right:13px;}
-    .watchbtn{margin:12px 0 0 14px;padding:7px 21px;font-size:1.05em;}
+    .phimtitle{font-size:1.16em;margin:13px 15px 4px 15px;font-weight:800;}
+    .badge-new{display:inline-block;background:var(--accent);color:#fff;padding:2px 11px;border-radius:9px;margin:8px 0 0 13px;}
+    .badge-locked{background:#aabbc7;color:#173;padding:2px 11px;border-radius:8px;font-size:.99em;position:absolute;top:12px;right:14px;}
+    .watchbtn{margin:13px 0 0 16px;padding:8px 21px;font-size:1.03em;}
     .watchbtn.locked{background:#666;color:#ccc;}
-    .modal{position:fixed;inset:0;background:#101429f3;backdrop-filter:blur(12px) brightness(.99);display:flex;align-items:center;justify-content:center;z-index:9999;}
-    .modalDriveCustom{background:linear-gradient(135deg,#23222c 93%,#19181d 120%);border-radius:24px;box-shadow:0 8px 52px #18192a;background-clip:padding-box;padding:28px 25px 18px 25px;min-width:340px;width:99vw;max-width:880px;position:relative;max-height:97vh;display:flex;flex-direction:column;overflow-y:auto;animation:popModalIn .45s;}
-    .closebtn2{position:absolute;right:10px;top:10px;background:#e50914;color:#ffe066;border:none;border-radius:16px;padding:7px 13px;font-size:1.26em;cursor:pointer;}
-    .movie-player-plyr {display:none;margin-bottom:18px;}
-    .movie-player-iframe {display:none;margin-bottom:18px;}
+    .phimdesc, .phimmeta, .phimrate, .phimcast, .phimid, .phimtr, .phimcmt{
+      margin:0 15px 3px 15px;line-height:1.48;}
+    .phimdesc{color:#f2e9ce;font-size:.99em;}
+    .phimmeta{color:var(--accent2);font-size:.98em;}
+    .phimid{color:#cee7ff;font-size:.93em;}
+    .phimrate{color:#f6d97e;}
+    .phimtr{color:#b9f;}
+    .phimcast{color:#aefacb;}
+    .phimcmt{color:#b9bcc4;font-style:italic;font-size:.96em}
+    .modal{position:fixed;inset:0;background:#11172add;backdrop-filter:blur(8px) brightness(.99);display:flex;align-items:center;justify-content:center;z-index:9999;}
+    .modalDriveCustom{
+      background:linear-gradient(130deg,#23222c 89%,#23223e 120%);
+      border-radius:25px;box-shadow:0 8px 56px #1919274d;padding:27px 22px 18px 22px;margin:0 auto;min-width:280px;max-width:800px;width:98vw;max-height:98vh;position:relative;overflow-y:auto;animation:popModalIn .52s;}
+    .movie-player-plyr {display:none;margin-bottom:15px;}
+    .movie-player-iframe {display:none;margin-bottom:14px;}
     .modalDriveCustom.show-plyr .movie-player-plyr {display:block;}
     .modalDriveCustom.show-drive .movie-player-iframe {display:block;}
-    .plyr {border-radius:18px;box-shadow:0 8px 38px #0005;}
-    .player-toolbar{display:flex;align-items:center;justify-content:space-between;margin:7px 0 0 0;}
-    .btnshare[data-tip]:hover:after{content: attr(data-tip)" 🚀";position:absolute;top:-50px;right:-6px;background:#1b295c;color:#ffe066;padding:8px 16px;border-radius:8px;font-size:1em;white-space:nowrap;z-index:22;box-shadow:0 3px 22px #001a,0 1px 8px #ffe0662c;opacity:1;}
-    #playerFields{margin:16px 0 0 0;line-height:1.57;}
-    @keyframes flyIn{0%{opacity:0;transform:translateY(46px) scale(.96);}100%{opacity:1;transform:translateY(0) scale(1);}}
-    @keyframes popModalIn{0%{opacity:0;transform:scale(.80) translateY(70px);}70%{opacity:.86;transform:scale(1.02) translateY(-8px);}100%{opacity:1;transform:scale(1) translateY(0);}}
-    .footer-moviehub{background:linear-gradient(129deg,#23212e 84%,#181930 106%);color:#ffe4b0;text-align:center;padding:22px 6vw 14px 6vw;margin-top:44px;}
-    .footer-logo{height:38px;}
-    .footer-content{text-align:left;line-height:1.57;}
-    #globalLoading {display:flex;align-items:center;justify-content:center;position:fixed;inset:0;z-index:99999;background:#18181e;transition:.4s;opacity:1;}
+    .plyr {border-radius:14px;box-shadow:0 8px 38px #0007;}
+    .player-toolbar{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
+    .btnshare[data-tip]:hover:after{content: attr(data-tip)" 🚀";position:absolute;top:-50px;right:-6px;background:#262a6c;color:var(--accent2);padding:8px 15px;border-radius:8px;font-size:1em;white-space:nowrap;z-index:22;box-shadow:0 3px 21px #0019,0 1px 11px #ffe0663c;opacity:1;}
+    #playerFields{margin:17px 5px 0 3px;line-height:1.61;}
+    .closebtn2{position:absolute;right:11px;top:11px;background:var(--accent);color:var(--accent2);border:none;border-radius:13px;padding:7px 13px;font-size:1.22em;font-weight:900;cursor:pointer;}
+    .footer-moviehub{background:#19192c;color:#e6ceb0;text-align:center;padding:20px 4vw 11px 4vw;margin-top:38px;font-size:1.05em;}
+    .footer-logo{height:35px;}
+    #globalLoading {display:flex;align-items:center;justify-content:center;position:fixed;inset:0;z-index:99999;background:#14161a;transition:.41s;opacity:1;}
     #globalLoading.done{opacity:0;pointer-events:none;}
-    #globalLoading .spinner{width:44px;height:44px;border-radius:50%;border:7px solid #ffe066;border-top:7px solid #e50914;animation:spin1 0.88s infinite linear;}
+    #globalLoading .spinner{width:39px;height:39px;border-radius:50%;border:6px solid #ffe066;border-top:6px solid #e50914;animation:spin1 0.8s infinite linear;}
     @keyframes spin1 {to{transform:rotate(360deg);}}
+    @keyframes flyIn{0%{opacity:0;transform:translateY(30px) scale(.97);}100%{opacity:1;transform:translateY(0) scale(1);}}
+    @keyframes popModalIn{0%{opacity:0;transform:scale(.88) translateY(80px);}100%{opacity:1;transform:scale(1) translateY(0);}
+    }
+    @media (max-width:900px){.container{max-width:99vw;padding:7vw 1vw 27vw 1vw;}.phimcard{max-width:99vw;flex:1 1 98vw;}}
+    @media (max-width:600px){.phimdesc,.phimmeta,.phimid{font-size:.97em;}.modalDriveCustom{max-width:97vw;min-width:90vw;padding:16px 4vw 12px 4vw;}}
   </style>
 </head>
 <body>
@@ -60,19 +79,19 @@
   <div class="right"></div>
 </header>
 <div class="container" role="main">
-  <h2>Proxy Google Drive Player – Hiện đầy đủ trình phát video và dữ liệu sheet</h2>
+  <h2>Web phim hiện đại: bảo mật, tốc độ, trình phát Drive/Proxy, hiệu ứng tối ưu cho mọi thiết bị</h2>
   <div id="genreRows"></div>
 </div>
 <div id="playerModal" class="modal" style="display:none;" aria-modal="true">
   <div class="modalDriveCustom" onclick="event.stopPropagation();">
     <button class="closebtn2" onclick="closePlayer()" aria-label="Đóng player phim">&times;</button>
     <div class="movie-player-plyr"><video id="plyrVideo" playsinline controls poster="" style="width:100%;" crossorigin="anonymous"></video></div>
-    <div class="movie-player-iframe"><iframe id="driveFrame" style="width:100%;aspect-ratio:16/9;min-height:210px;border-radius:18px;background:#000;border:none;"></iframe></div>
-    <div class="player-toolbar" style="margin-top:16px">
-      <span id="playerTitle" class="player-title"></span>
-      <button class="btnshare" onclick="copyPlayerLink()" data-tip="Dán ra bất kỳ đâu để chia sẻ!">📋 Sao chép link phim</button>
+    <div class="movie-player-iframe"><iframe id="driveFrame" style="width:100%;aspect-ratio:16/9;min-height:210px;border-radius:16px;background:#000;border:none;"></iframe></div>
+    <div class="player-toolbar">
+      <span id="playerTitle" style="font-size:1.13em;font-weight:700;"></span>
+      <button class="btnshare" onclick="copyPlayerLink()" data-tip="Dán link phim cho bạn bè">📋 Sao chép link phim</button>
     </div>
-    <div id="playerFields" style="margin:18px 0 0 0;line-height:1.57;"></div>
+    <div id="playerFields"></div>
   </div>
 </div>
 <footer class="footer-moviehub">
@@ -99,12 +118,6 @@ async function showPhim(_id){
   location.hash = "id=" + encodeURIComponent(m.id);
   let fileId = extractFileId(m.drive);
   let modal = document.querySelector('.modalDriveCustom');
-  function fallbackDrivePreview() {
-    document.querySelector('.movie-player-iframe').style.display = 'block';
-    document.querySelector('.movie-player-plyr').style.display = 'none';
-    document.getElementById('driveFrame').src=fileId?`https://drive.google.com/file/d/${fileId}/preview`:m.drive;
-    modal.classList.remove('show-plyr'); modal.classList.add('show-drive');
-  }
   document.getElementById('playerTitle').innerText = m.title;
   document.getElementById('playerFields').innerHTML = `
     <b>Mô tả:</b> ${m.desc||''}<br>
@@ -114,9 +127,15 @@ async function showPhim(_id){
     <b>Link Google Drive:</b> <a href="${m.drive}" target="_blank" style="color:#76fc;">Xem gốc</a><br>
     <b>Điểm trung bình:</b> ${m.diem||''}<br>
     <b>Comments:</b> ${m.comments||''}<br>
-    <b>Trailer:</b> ${m.trailer?`<a href="${m.trailer}" target="_blank" style="color:#fb3e">Xem trailer</a>`:''}<br>
+    <b>Trailer:</b> ${m.trailer?`<a href="${m.trailer}" target="_blank" style="color:#ea7">Xem trailer</a>`:''}<br>
     <b>Diễn viên/Đạo diễn:</b> ${m.cast||''}
   `;
+  function fallbackDrivePreview() {
+    document.querySelector('.movie-player-iframe').style.display = 'block';
+    document.querySelector('.movie-player-plyr').style.display = 'none';
+    document.getElementById('driveFrame').src=fileId?`https://drive.google.com/file/d/${fileId}/preview`:m.drive;
+    modal.classList.remove('show-plyr'); modal.classList.add('show-drive');
+  }
   if(fileId){
     getGdPlayerProxyMp4(fileId).then(res=>{
       if(res){
@@ -204,7 +223,7 @@ function renderPhim() {
 window.onload = async ()=>{
   document.getElementById('globalLoading').classList.remove('done');
   await fetchPhim();
-  setTimeout(()=>{document.getElementById('globalLoading').classList.add('done');},250);
+  setTimeout(()=>{document.getElementById('globalLoading').classList.add('done');},220);
   if(location.hash.startsWith("#id=")){ let id=decodeURIComponent(location.hash.slice(4)); showPhim(encodeURIComponent(id)); }
 }
 window.addEventListener("hashchange",()=>{ if(location.hash.startsWith("#id=")){ let id=decodeURIComponent(location.hash.slice(4)); showPhim(encodeURIComponent(id));} else closePlayer();});
