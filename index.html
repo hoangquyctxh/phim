@@ -2,11 +2,10 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
-  <title>MovieHub - Web xem phim hiện đại, player Drive proxy siêu mượt</title>
+  <title>MovieHub - Phim Google Drive Proxy Player</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Xem phim online với giao diện đẹp chuẩn điện ảnh, hiệu ứng mượt, player hỗ trợ Google Drive proxy không quota và mp4 chất lượng cao.">
+  <meta name="description" content="Xem phim trên Google Drive siêu mượt, không giới hạn quota, giao diện đẹp, hiệu ứng hiện đại, bảo mật tuyệt đối.">
   <link rel="icon" type="image/png" href="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png"/>
-  <!-- Font Manrope và Plyr player -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
   <meta http-equiv="Content-Security-Policy"
@@ -16,12 +15,12 @@
     img-src * data:;
     script-src 'self' 'unsafe-inline' https://cdn.plyr.io https://cdn.jsdelivr.net;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.plyr.io;">
-  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
-  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
   <style>
-    :root { --bg-main: #181818; --bg-modal: #23222c; --txt-main: #fff; --phim-card: #222; --toolbar-title: #ffe066;
-      --accent: #e50914; --accent2: #ffe066;}
-    body {font-family:'Manrope',Arial,sans-serif;color:var(--txt-main);margin:0;background:linear-gradient(135deg,#23222e 60%,#222644 100%);}
+    :root {
+      --bg-main: #181818; --bg-modal: #23222c; --txt-main: #fff;
+      --phim-card: #242333; --toolbar-title: #ffe066; --accent: #e50914; --accent2: #ffe066;
+    }
+    body { font-family:'Manrope',Arial,sans-serif;color:var(--txt-main);margin:0;background:linear-gradient(135deg,#23222e 60%,#222644 100%);}
     header{display:flex;align-items:center;gap:15px;padding:16px 8vw 14px 4vw;background:linear-gradient(93deg,#232335 83%,#301d34 101%);}
     .logo{height:40px;}
     .title{font-size:clamp(1.32em,3vw,2.20em);color:var(--accent);font-weight:800;margin-left:2px;letter-spacing:.01em;text-shadow:0 2px 14px #e5091451;}
@@ -29,8 +28,6 @@
     .btn{padding:10px 21px;border:none;border-radius:9px;background:var(--accent);color:#fff;font-weight:800;cursor:pointer;transition:background .17s,box-shadow .18s,transform .09s;box-shadow:0 6px 26px #e5091422;}
     .btn:hover{background:#bb0917;}
     .btn:active{transform:scale(.96);}
-    .logout,.loginhdr{background:transparent;color:var(--accent2);border:none;font-size:1em;}
-    .logout:hover,.loginhdr:hover{color:var(--accent);}
     #genreFilter{padding:8px 13px;font-size:1em;border-radius:7px;background:#28223c;color:var(--accent2);border:none;}
     #themeToggle{margin-left:14px;padding:8px 16px;min-width:38px;}
     .container{max-width:1040px;margin:0 auto;padding:28px 7vw 70px 7vw;}
@@ -43,8 +40,6 @@
       transition:transform .22s,border .13s,box-shadow .23s cubic-bezier(.18,1.1,.41,.97);opacity:0;cursor:pointer;}
     .phimcard.appear{animation:flyIn 0.57s cubic-bezier(.23,.74,.42,1.11) forwards;}
     .phimcard:hover{transform:scale(1.072) translateY(-11px);box-shadow:0 21px 51px #e5091421,0 1px 21px #ffe06621;border:2.5px solid #ffe06634;z-index:2;}
-    .phimcard:active{box-shadow:0 5px 26px #e5091438,0 0px 9px #ffe06656;transform:scale(.98);}
-    @keyframes flyIn{0%{opacity:0;transform:translateY(46px) scale(.965);}100%{opacity:1;transform:translateY(0) scale(1);}}
     .phimimg{width:100%;aspect-ratio:2/3;object-fit:cover;border-bottom:2px solid #262626;filter:brightness(.985);}
     .phimtitle{font-size:1.16em;margin:14px 16px 8px 15px;font-weight:900;}
     .phimmeta{font-size:1.08em;color:var(--accent2);padding:0 16px;}
@@ -52,53 +47,40 @@
     .badge-locked{background:#aabbc7;color:#173;padding:2px 12px;border-radius:11px;font-size:1em;position:absolute;top:11px;right:12px;}
     .watchbtn{margin:15px 0 0 17px;padding:9px 24px;font-size:1.11em;}
     .watchbtn.locked{background:#666;color:#ccc;}
-    .modal{position:fixed;inset:0;background:#12162eee;backdrop-filter:blur(10px) brightness(.98);display:flex;align-items:center;justify-content:center;z-index:9999;}
+    .modal{position:fixed;inset:0;background:#12162ede;backdrop-filter:blur(10px) brightness(.98);display:flex;align-items:center;justify-content:center;z-index:9999;}
     .modalDriveCustom{
       background:linear-gradient(135deg,var(--bg-modal) 90%,#19181d 120%);
       border-radius:26px;box-shadow:0 8px 62px #18172a84;
       padding:33px 27px 24px 27px;min-width:340px;width:99vw;max-width:820px;position:relative;max-height:97vh;
-      display:flex;flex-direction:column;overflow-y:auto;transition:background .28s;animation:popModalIn .44s cubic-bezier(.32,1.31,.51,1) both;
-      outline:4px solid #e5091424;}
+      display:flex;flex-direction:column;overflow-y:auto;animation:popModalIn .44s cubic-bezier(.32,1.31,.51,1) both;}
     .movie-player-plyr {display:none;}
     .movie-player-iframe {display:none;}
     .modalDriveCustom.show-plyr .movie-player-plyr {display:block;}
     .modalDriveCustom.show-drive .movie-player-iframe {display:block;}
     .plyr {border-radius:18px;box-shadow:0 8px 38px #1e1c2a7c;background:#161932;}
-    .player-toolbar{display:flex;flex-direction:row;align-items:center;justify-content:space-between;margin-top:15px}
-    .player-title{font-size:1.17em;font-weight:700;line-height:1.4;color:var(--toolbar-title);}
-    .btnshare{padding:7px 16px;border-radius:10px;background:var(--accent2);color:#222;font-weight:800;border:none;font-size:.99em;cursor:pointer;position:relative;box-shadow:0 2px 11px #ffe0662d;}
-    .btnshare[data-tip]:hover:after{content: attr(data-tip)" 🚀";position:absolute;top:-40px;right:-9px;background:#222bca;color:#ffe066;padding:7px 20px;border-radius:8px;font-size:1.05em;white-space:nowrap;z-index:22;box-shadow:0 3px 14px #0004,0 1px 9px #ffe0662c;opacity:1;}
-    #playerDesc.player-desc{margin-top:14px;font-size:.99em;line-height:1.54;color:#ffe88d;max-height:230px;overflow-y:auto;margin-bottom:2px;padding-right:5px;}
-    .closebtn2{background:var(--accent);color:#fff;border:none;border-radius:13px;padding:8px 13px;font-size:1.33em;cursor:pointer;font-weight:900;position:absolute;right:17px;top:13px;}
-    .closebtn2:hover{background:#be0009;}
+    @keyframes flyIn{0%{opacity:0;transform:translateY(46px) scale(.965);}100%{opacity:1;transform:translateY(0) scale(1);}}
     @keyframes popModalIn{0%{opacity:0;transform:scale(.80) translateY(70px);}70%{opacity:.84;transform:scale(1.01) translateY(-8px);}100%{opacity:1;transform:scale(1) translateY(0);}}
-    .footer-moviehub{background:linear-gradient(129deg,#23212e 84%,#181930 106%);color:#ffe4b0;text-align:center;padding:25px 6vw 15px 6vw;font-size:1.08em;margin-top:50px;box-shadow:0 -1px 13px #07081c13;}
-    .footer-wrap{display:flex;align-items:center;justify-content:center;gap:19px;flex-wrap:wrap;}
-    .footer-logo{height:43px;width:auto;display:inline-block;vertical-align:middle;opacity:.98;filter:drop-shadow(0 1px 9px #ffe06642);}
+    .footer-moviehub{background:linear-gradient(129deg,#23212e 84%,#181930 106%);color:#ffe4b0;text-align:center;padding:25px 6vw 15px 6vw;font-size:1.08em;margin-top:50px;}
+    .footer-logo{height:43px;width:auto;display:inline-block;vertical-align:middle;opacity:.98;}
     .footer-content{text-align:left;min-width:180px;line-height:1.57;}
-    @media (max-width:650px){.footer-wrap{flex-direction:column;gap:9px;}.footer-moviehub{padding:13px 2vw 17px 2vw;}.footer-logo{height:31px;}}
-    @media (max-width:730px){.container{padding:11px 2vw 51px 2vw;}.phimlist{gap:10vw;}.phimcard{flex-basis:47vw;max-width:97vw;}header{flex-direction:column;align-items:flex-start;gap:9px;}}
-    .btn,.loginbtn,.closebtn,.closebtn2{outline:none;}
-    .btn:focus,.watchbtn:focus,.loginbtn:focus,input:focus,select:focus{box-shadow:0 0 0 2px #ffe06694;}
+    @media (max-width:650px){.footer-moviehub{padding:13px 2vw 17px 2vw;}.footer-logo{height:31px;}}
   </style>
 </head>
 <body>
-<div id="globalLoading"><div class="spinner"></div></div>
 <header>
   <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png" class="logo" alt="MovieHub"/>
   <span class="title">MovieHub</span>
   <select id="genreFilter"><option value="">Tất cả thể loại</option></select>
   <button id="themeToggle" class="btn" onclick="toggleTheme()" aria-label="Đổi giao diện tối/sáng">🌙</button>
   <div class="right">
-    <button id="loginBtn" class="loginhdr btn" onclick="showLogin()" style="display:inline-block">Đăng nhập</button>
-    <button id="logoutBtn" class="logout" onclick="logoutApp()" style="display:none">Đăng xuất</button>
+    <button id="loginBtn" class="loginhdr btn" style="display:inline-block">Đăng nhập</button>
+    <button id="logoutBtn" class="logout" style="display:none">Đăng xuất</button>
   </div>
 </header>
 <div class="container" role="main">
-  <h2>Kho phim online - Xem phim theo đặc quyền tài khoản</h2>
+  <h2>Kho phim online - Hỗ trợ Google Drive, không giới hạn, giao diện điện ảnh</h2>
   <div id="genreRows"></div>
 </div>
-<div id="loginModal" class="modal" style="display:none;" aria-modal="true" role="dialog">...</div>
 <div id="playerModal" class="modal" style="display:none;" aria-modal="true" role="dialog">
   <div class="modalDriveCustom" onclick="event.stopPropagation();" tabindex="0">
     <button class="closebtn2" onclick="closePlayer()" aria-label="Đóng player phim">&times;</button>
@@ -106,7 +88,7 @@
       <video id="plyrVideo" playsinline controls poster="" style="width:100%;" crossorigin="anonymous"></video>
     </div>
     <div class="movie-player-iframe">
-      <iframe id="driveFrame" style="width:100%;aspect-ratio:16/9;min-height:210px;border-radius:18px;box-shadow:0 6px 48px #000d;background:#0a0a0a;border:none;"></iframe>
+      <iframe id="driveFrame" style="width:100%;aspect-ratio:16/9;min-height:210px;border-radius:18px;background:#000;border:none;"></iframe>
     </div>
     <div class="player-toolbar">
       <span id="playerTitle" class="player-title">Tên phim</span>
@@ -116,13 +98,11 @@
   </div>
 </div>
 <footer class="footer-moviehub">
-  <div class="footer-wrap">
-    <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png" alt="MovieHub Logo" class="footer-logo"/>
-    <div class="footer-content">
-      <b style="font-size:1.13em;">MovieHub</b><br>
-      Đăng ký tài khoản, hỗ trợ vấn đề liên quan...<br>
-      Email: <a href="mailto:moviehub_vn@hotmail.com" style="color:#ffe066;text-decoration:underline;">moviehub_vn@hotmail.com</a>
-    </div>
+  <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png" alt="MovieHub Logo" class="footer-logo"/>
+  <div class="footer-content">
+    <b style="font-size:1.13em;">MovieHub</b><br>
+    Đăng ký tài khoản, hỗ trợ vấn đề liên quan...<br>
+    Email: <a href="mailto:moviehub_vn@hotmail.com" style="color:#ffe066;text-decoration:underline;">moviehub_vn@hotmail.com</a>
   </div>
 </footer>
 <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
@@ -130,41 +110,85 @@
 const SHEET_ID = '15mFrve7Z-_zi_7AvSq3t9Nti1VjINVHCQDF7LRmP1QQ';
 const API_KEY = 'AIzaSyD5dWLgYZPu1_-AkwAaHPClGOOQ-Lq5EGI';
 const SHEET_RANGE = 'Sheet1!A1:Z';
-const USERS_RANGE = 'Users!A2:C';
-let userList = [];
-let phimList = [];
-let loggedUser = false, userName = '';
-let genresSet = new Set();
+let phimList = [], genresSet = new Set(), loggedUser = false;
 
-function getDriveProxyLink(driveLink) {
-  let match = driveLink.match(/(?:file\/d\/|open\?id=)([\w-]+)/) || driveLink.match(/id=([\w-]+)/);
-  let fileId = match ? match[1] : null;
-  // Proxy open: https://gdplayer.vip/proxy/?id=...
-  return fileId ? `https://gdplayer.vip/proxy/?id=${fileId}` : driveLink;
+function extractFileId(link) {
+  let m = link.match(/file\/d\/([a-zA-Z0-9_-]+)/) || link.match(/[?&]id=([a-zA-Z0-9_-]+)/) || link.match(/^([a-zA-Z0-9_-]{25,})$/);
+  return m ? m[1] : null;
 }
-
-async function fetchUsers() {
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${USERS_RANGE}?key=${API_KEY}`;
-  let res = await fetch(url); let data = await res.json();
-  userList = (data.values||[]).map(r=>({user:r[0]?.trim(),pass:r[1]?.trim(),role:r[2]?.trim()}));
+async function getGdPlayerProxyMp4(fileId) {
+  try{
+    const api = `https://gdplayer.vip/api/video?file_id=${fileId}`;
+    const res = await fetch(api);
+    if(!res.ok) return null;
+    const dt = await res.json();
+    return dt.file;
+  }catch(e){return null;}
+}
+async function showPhim(_id){
+  let phim = phimList.find(m=>encodeURIComponent(m.id)===_id);
+  if(!phim) return alert("Không tìm thấy phim");
+  if(phim.special&&!loggedUser) { alert('Vui lòng đăng nhập để xem phim khoá!'); return; }
+  location.hash = "id=" + encodeURIComponent(phim.id);
+  let fileId = extractFileId(phim.drive);
+  let modal = document.querySelector('.modalDriveCustom');
+  let poster = phim.poster||"";
+  function fallbackDrivePreview() {
+    document.getElementById('driveFrame').src = fileId?`https://drive.google.com/file/d/${fileId}/preview`:phim.drive;
+    modal.classList.remove('show-plyr'); modal.classList.add('show-drive');
+  }
+  if(fileId){
+    document.getElementById('playerTitle').innerText = phim.title;
+    document.getElementById('playerDesc').innerText = phim.desc||"";
+    document.querySelector(".movie-player-plyr").innerHTML = `<video id="plyrVideo" playsinline controls poster="${poster}" style="width:100%;" crossorigin="anonymous"></video>`;
+    window.playerPlyr = new Plyr('#plyrVideo',{controls:['play-large','play','progress','current-time','duration','mute','volume','settings','fullscreen'],settings:['quality','speed','loop'],ratio:'16:9'});
+    getGdPlayerProxyMp4(fileId).then(res=>{
+      if(res){
+        document.getElementById('plyrVideo').src = res;
+        window.playerPlyr.source = {type:"video",sources:[{src:res,type:'video/mp4',size:720}]};
+        modal.classList.remove('show-drive'); modal.classList.add('show-plyr');
+      }else{
+        fallbackDrivePreview();
+      }
+    }).catch(fallbackDrivePreview);
+  }else{
+    fallbackDrivePreview();
+  }
+  document.getElementById('playerModal').style.display = 'flex';
+}
+function closePlayer(){
+  document.getElementById('driveFrame').src='';
+  if(window.playerPlyr) window.playerPlyr.pause();
+  document.getElementById('playerModal').style.display='none';
+  document.querySelector('.modalDriveCustom').classList.remove('show-drive','show-plyr');
+  history.replaceState(null, null, window.location.pathname);
+}
+function copyPlayerLink() {
+  let link = window.location.origin + window.location.pathname + location.hash;
+  navigator.clipboard.writeText(link);
+  alert("Đã sao chép link phim: " + link);
+}
+function toggleTheme() {
+  const body = document.body;
+  if(body.classList.contains("lightmode")){
+    body.classList.remove("lightmode");
+    document.getElementById('themeToggle').innerText = '🌙';
+    localStorage.setItem("moviehub_theme",'dark');
+  } else {
+    body.classList.add("lightmode");
+    document.getElementById('themeToggle').innerText = '☀️';
+    localStorage.setItem("moviehub_theme",'light');
+  }
 }
 async function fetchPhim() {
   let url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_RANGE}?key=${API_KEY}`;
   let res = await fetch(url); let data = await res.json();
   let rows = data.values||[], header = rows[0];
   let idx = n => header.findIndex(x=>x&&x.trim().toLowerCase() === n);
-  phimList = rows.slice(1).map(row=>({
-    title:row[idx('tên phim')]||'',
-    desc:row[idx('mô tả')]||'',
-    genre:row[idx('thể loại')]||'Khác',
-    drive:row[idx('link google drive')]||'',
-    poster:row[idx('link poster')]||'',
-    year:row[idx('năm')]||'',
-    id:row[idx('id')]||row[idx('tên phim')]||'',
-    special: (row[idx('special')]||'').trim().toLowerCase()==='yes',
-    isNew: row[idx('năm')] && +row[idx('năm')] >= (new Date().getFullYear()-1)
-  })).filter(m=>m.title);
+  phimList = rows.slice(1).map(row=>(
+    {title:row[idx('tên phim')]||'',desc:row[idx('mô tả')]||'',genre:row[idx('thể loại')]||'Khác',drive:row[idx('link google drive')]||'',poster:row[idx('link poster')]||'',year:row[idx('năm')]||'',id:row[idx('id')]||row[idx('tên phim')]||'',special:(row[idx('special')]||'').trim().toLowerCase()==='yes',isNew:row[idx('năm')]&&+row[idx('năm')] >= (new Date().getFullYear()-1)})).filter(m=>m.title);
   genresSet = new Set(phimList.map(m=>m.genre).filter(g=>g&&g!==''));
+  updateGenreOptions();renderPhim();
 }
 function updateGenreOptions() {
   let sel = document.getElementById("genreFilter");
@@ -181,134 +205,26 @@ function renderPhim() {
   for(const genre of Object.keys(phimTheoGenre)){
     html += `<div class="row-title">${genre}</div>
       <div class="phimlist">${
-        phimTheoGenre[genre].map(m=>`<div class="phimcard"
-            onclick="${m.special&&!loggedUser?'showLogin()':'showPhim(\''+encodeURIComponent(m.id)+'\')'}"
-            >
+        phimTheoGenre[genre].map(m=>`<div class="phimcard" onclick="showPhim('${encodeURIComponent(m.id)}')">
         ${m.isNew?'<span class="badge-new">MỚI</span>':''}
         ${m.special?'<span class="badge-locked">Khoá</span>':''}
         <img class="phimimg" src="${m.poster||'https://img.icons8.com/color/480/movie-projector.png'}" alt="">
         <div class="phimtitle">${m.title}</div>
         <div class="phimmeta">${m.genre||'Chưa rõ'} | ${m.year||''}</div>
-        <button class="btn watchbtn${m.special&&!loggedUser?' locked':''}"
-          tabindex="-1"
-          onclick="event.stopPropagation();${m.special&&!loggedUser?'showLogin()':'showPhim(\''+encodeURIComponent(m.id)+'\')'}">
+        <button class="btn watchbtn${m.special&&!loggedUser?' locked':''}" tabindex="-1" onclick="event.stopPropagation();showPhim('${encodeURIComponent(m.id)}')">
           ${m.special&&!loggedUser?'Chỉ thành viên':'Xem phim'}
         </button>
       </div>`).join('')
       }</div>`;
   }
   document.getElementById('genreRows').innerHTML = html;
-  setTimeout(()=>{
-    document.querySelectorAll('.phimcard').forEach((el,i)=>setTimeout(()=>el.classList.add('appear'),80*i));
-  },50);
-  document.getElementById('logoutBtn').style.display = loggedUser ? 'inline-block' : 'none';
-  document.getElementById('loginBtn').style.display = loggedUser ? 'none' : 'inline-block';
+  setTimeout(()=>{document.querySelectorAll('.phimcard').forEach((el,i)=>setTimeout(()=>el.classList.add('appear'),80*i));},50);
 }
-// Tích hợp proxy fallback cho Google Drive!
-function showPhim(_id){
-  let phim = phimList.find(m=>encodeURIComponent(m.id)===_id);
-  if(!phim) return alert("Không tìm thấy phim");
-  if(phim.special&&!loggedUser) { showLogin(); return; }
-  location.hash = "id=" + encodeURIComponent(phim.id);
-  let isDrivePreview = phim.drive.includes('/preview');
-  let modal = document.querySelector('.modalDriveCustom');
-  if (isDrivePreview) {
-    document.getElementById('driveFrame').src = phim.drive;
-    modal.classList.remove('show-plyr'); modal.classList.add('show-drive');
-  } else {
-    let directMp4 = phim.drive;
-    if (/drive\.google\.com.*file\/d|open\?id=|id=/.test(phim.drive)) {
-      directMp4 = getDriveProxyLink(phim.drive);
-    }
-    document.getElementById('plyrVideo').src = directMp4;
-    document.getElementById('plyrVideo').poster = phim.poster||"";
-    if (window.playerPlyr && playerPlyr.source)
-      playerPlyr.source = {type:"video",sources:[{src:directMp4,type:'video/mp4',size:720}]};
-    modal.classList.remove('show-drive'); modal.classList.add('show-plyr');
-  }
-  document.getElementById("playerTitle").innerText = phim.title;
-  document.getElementById("playerDesc").innerText = phim.desc||"";
-  document.getElementById('playerModal').style.display = 'flex';
-  setTimeout(()=>document.getElementById('playerModal').scrollIntoView({behavior:'smooth',block:'center'}),60);
-}
-function closePlayer(){
-  document.getElementById('driveFrame').src='';
-  document.getElementById('plyrVideo').src='';
-  document.getElementById('playerModal').style.display='none';
-  let modal = document.querySelector('.modalDriveCustom');
-  modal.classList.remove('show-drive','show-plyr');
-  history.replaceState(null, null, window.location.pathname);
-}
-let playerPlyr = null;
-window.Plyr && setTimeout(()=>{
-  playerPlyr = new Plyr('#plyrVideo',{
-    controls:['play-large','play','progress','current-time','duration','mute','volume','settings','fullscreen'],
-    settings:['quality','speed','loop'],
-    ratio:'16:9',
-    clickToPlay:true,
-    keyboard: { global: true }
-  });
-},350);
-
-function copyPlayerLink() {
-  let link = window.location.origin + window.location.pathname + location.hash;
-  navigator.clipboard.writeText(link);
-  alert("Đã sao chép link phim: " + link);
-}
-function showLogin(){
-  document.getElementById('loginModal').style.display = 'flex';
-  document.getElementById('loginUser').value = '';
-  document.getElementById('loginPass').value = '';
-  document.getElementById('loginErr').style.display = 'none';
-  setTimeout(()=>document.getElementById('loginUser').focus(),120);
-}
-function closeLogin(){
-  document.getElementById('loginModal').style.display='none';
-}
-function doLogin() {
-  let user = document.getElementById('loginUser').value.trim();
-  let pass = document.getElementById('loginPass').value.trim();
-  let found = userList.find(u=>u.user===user&&u.pass===pass);
-  if(found){
-    loggedUser = true;
-    userName = found.user;
-    closeLogin();
-    renderPhim();
-    alert('Đăng nhập thành công!');
-  } else {
-    document.getElementById('loginErr').innerText = 'Sai tài khoản hoặc mật khẩu!';
-    document.getElementById('loginErr').style.display = 'block';
-  }
-}
-function logoutApp(){
-  loggedUser = false; userName = '';
-  renderPhim();
-  alert('Đã đăng xuất!');
-}
-function toggleTheme() {
-  const body = document.body;
-  if(body.classList.contains("lightmode")){
-    body.classList.remove("lightmode");
-    document.getElementById('themeToggle').innerText = '🌙';
-    localStorage.setItem("moviehub_theme",'dark');
-  } else {
-    body.classList.add("lightmode");
-    document.getElementById('themeToggle').innerText = '☀️';
-    localStorage.setItem("moviehub_theme",'light');
-  }
-}
-window.addEventListener('DOMContentLoaded',()=>{
+window.onload = async ()=>{
+  await fetchPhim();
   let th = localStorage.getItem("moviehub_theme");
   if(th==="light"){document.body.classList.add("lightmode");document.getElementById('themeToggle').innerText='☀️';}
   else{document.getElementById('themeToggle').innerText='🌙';}
-});
-window.onload = async ()=>{
-  document.getElementById('globalLoading').classList.remove('done');
-  await fetchUsers();
-  await fetchPhim();
-  updateGenreOptions();
-  renderPhim();
-  setTimeout(()=>{document.getElementById('globalLoading').classList.add('done');},350);
   if (location.hash.startsWith("#id=")) {
     let id = decodeURIComponent(location.hash.slice(4));
     showPhim(encodeURIComponent(id));
