@@ -2,58 +2,56 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
-  <title>MovieHub - Phim Google Drive Proxy Player</title>
+  <title>MovieHub - Google Drive Proxy, Data Sheet Tối Ưu</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Xem phim Google Drive proxy siêu mượt, không quota, code đẹp, hiệu ứng hiện đại, chuẩn app phim lớn.">
+  <meta name="description" content="Xem phim Google Drive proxy, lấy dữ liệu mạnh từ Google Sheet, hỗ trợ tất cả trường, đăng nhập linh hoạt.">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-  <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;
-    frame-src https://drive.google.com;
-    connect-src https://sheets.googleapis.com https://gdplayer.vip;
-    img-src * data:;
-    script-src 'self' 'unsafe-inline' https://cdn.plyr.io https://cdn.jsdelivr.net;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.plyr.io;">
   <style>
-    body { font-family:'Manrope',Arial,sans-serif;color:#fff;background:linear-gradient(135deg,#23222e 60%,#222644 100%);margin:0;}
+    body{font-family:'Manrope',Arial,sans-serif;color:#fff;background:linear-gradient(135deg,#23222e 60%,#222644 100%);margin:0;}
     header{display:flex;align-items:center;gap:15px;padding:16px 8vw 14px 4vw;background:linear-gradient(93deg,#232335 83%,#301d34 101%);}
     .logo{height:40px;}
     .title{font-size:clamp(1.32em,3vw,2.20em);color:#e50914;font-weight:800;margin-left:2px;text-shadow:0 2px 14px #e5091451;}
     .right{margin-left:auto;display:flex;gap:15px;align-items:center;}
     .btn{padding:10px 21px;border:none;border-radius:9px;background:#e50914;color:#fff;font-weight:800;cursor:pointer;}
     .btn:hover{background:#bb0917;}
-    .btn:active{transform:scale(.96);}
     #genreFilter{padding:8px 13px;font-size:1em;border-radius:7px;background:#28223c;color:#ffe066;}
     #themeToggle{margin-left:14px;padding:8px 16px;min-width:38px;}
-    .container{max-width:1040px;margin:0 auto;padding:28px 7vw 70px 7vw;}
+    .container{max-width:1100px;margin:0 auto;padding:28px 7vw 70px 7vw;}
     h2{margin-top:38px;text-shadow:0 2px 11px #e509142a;font-size:clamp(1.3em,3vw,1.9em);font-weight:800;}
-    .row-title{color:#ffe066;font-size:1.16em;margin:38px 0 16px 9px;font-weight:800;}
-    .phimlist{display:flex;flex-wrap:wrap;gap:33px;}
-    .phimcard{flex:0 0 216px;background:#242333;border-radius:22px;padding:0 0 14px 0;box-shadow:0 4px 33px #15153b18;overflow:hidden;position:relative;margin-bottom:14px;transition:transform .22s;}
-    .phimcard.appear{animation:flyIn 0.57s cubic-bezier(.23,.74,.42,1.11) forwards;}
-    .phimcard:hover{transform:scale(1.09) translateY(-15px);box-shadow:0 21px 51px #e5091421;}
+    .row-title{color:#ffe066;font-size:1.17em;margin:33px 0 17px 9px;font-weight:800;}
+    .phimlist{display:flex;flex-wrap:wrap;gap:26px;}
+    .phimcard{background:#222b3c;border-radius:19px;padding:0 0 12px 0;box-shadow:0 4px 20px #15153b20;overflow:hidden;position:relative;margin-bottom:14px;min-width:230px;max-width:320px;flex:1 1 280px;transition:.17s;}
+    .phimcard:hover{transform:scale(1.07) translateY(-15px);}
     .phimimg{width:100%;aspect-ratio:2/3;object-fit:cover;}
-    .phimtitle{font-size:1.13em;margin:14px 16px 8px 15px;font-weight:900;}
-    .phimmeta{font-size:1.08em;color:#ffe066;padding:0 16px;}
-    .badge-new{display:inline-block;background:#e50914;color:#fff;padding:2px 13px;font-size:1em;border-radius:9px;margin:8px 0 0 14px;}
-    .badge-locked{background:#aabbc7;color:#173;padding:2px 12px;border-radius:11px;font-size:1em;position:absolute;top:11px;right:12px;}
-    .watchbtn{margin:15px 0 0 17px;padding:9px 24px;font-size:1.12em;}
+    .phimtitle{font-size:1.16em;margin:12px 14px 3px 14px;font-weight:800;}
+    .phimdesc{padding:0 14px 3px 14px;font-size:.98em;color:#e0dcc3;}
+    .phimmeta, .phimrate, .phimcast, .phimid, .phimtr, .phimcmt{font-size:.96em;margin:0 14px 3px 14px;line-height:1.48;}
+    .phimmeta{color:#ffe066;}
+    .phimrate{color:#fabd04;}
+    .phimid{color:#d7ecff;}
+    .phimtr{color:#b9f;}
+    .phimcmt{color:#abb7cc;font-style:italic;}
+    .phimcast{color:#bdf7b7;}
+    .badge-new{display:inline-block;background:#e50914;color:#fff;padding:2px 13px;border-radius:8px;margin:8px 0 0 14px;}
+    .badge-locked{background:#aabbc7;color:#173;padding:2px 12px;border-radius:8px;font-size:.98em;position:absolute;top:11px;right:13px;}
+    .watchbtn{margin:12px 0 0 14px;padding:7px 21px;font-size:1.07em;}
     .watchbtn.locked{background:#666;color:#ccc;}
-    .modal{position:fixed;inset:0;background:#12162ede;backdrop-filter:blur(10px) brightness(.98);display:flex;align-items:center;justify-content:center;z-index:9999;}
-    .modalDriveCustom{
-      background:linear-gradient(135deg,#23222c 90%,#19181d 120%);
-      border-radius:26px;box-shadow:0 8px 62px #18172a84;
-      padding:33px 27px 24px 27px;min-width:340px;width:99vw;max-width:820px;position:relative;max-height:97vh;
-      display:flex;flex-direction:column;overflow-y:auto;}
+    .modal{position:fixed;inset:0;background:#11172ad6;backdrop-filter:blur(8px) brightness(.99);display:flex;align-items:center;justify-content:center;z-index:9999;}
+    .modalDriveCustom{background:linear-gradient(135deg,#23222c 93%,#19181d 120%);border-radius:24px;box-shadow:0 8px 42px #191727;background-clip:padding-box;padding:28px 25px 20px 25px;min-width:350px;width:99vw;max-width:830px;position:relative;max-height:97vh;display:flex;flex-direction:column;overflow-y:auto;}
+    .closebtn2{position:absolute;right:10px;top:10px;background:#e50914;color:#ffe066;border:none;border-radius:16px;padding:7px 13px;font-size:1.26em;cursor:pointer;}
     .movie-player-plyr {display:none;}
     .movie-player-iframe {display:none;}
     .modalDriveCustom.show-plyr .movie-player-plyr {display:block;}
     .modalDriveCustom.show-drive .movie-player-iframe {display:block;}
-    .plyr {border-radius:18px;box-shadow:0 8px 38px #1e1c2a7c;background:#161932;}
-    .footer-moviehub{background:linear-gradient(129deg,#23212e 84%,#181930 106%);color:#ffe4b0;text-align:center;padding:22px 6vw 14px 6vw;}
-    .footer-logo{height:38px;opacity:.98;}
+    .plyr {border-radius:18px;box-shadow:0 8px 38px #0005;background:#111932;}
+    .footer-moviehub{background:linear-gradient(129deg,#23212e 84%,#181930 106%);color:#ffe4b0;text-align:center;padding:22px 6vw 14px 6vw;margin-top:44px;}
+    .footer-logo{height:38px;}
     .footer-content{text-align:left;line-height:1.57;}
-    @keyframes flyIn{0%{opacity:0;transform:translateY(46px) scale(.965);}100%{opacity:1;transform:translateY(0) scale(1);}}
+    /* Modal đăng nhập */
+    #loginModal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:#0a1429bb;z-index:20000;}
+    .modalDriveCustom input{width:94%;margin-bottom:13px;border-radius:8px;border:none;padding:11px;font-size:1em;background:#232946;color:#fff;}
+    .errmsg{color:#f36;font-size:1em;}
   </style>
 </head>
 <body>
@@ -68,37 +66,35 @@
   </div>
 </header>
 <div class="container" role="main">
-  <h2>Kho phim MovieHub - Xem phim Google Drive không quota</h2>
+  <h2>Kho phim MovieHub (Data Google Sheet đầy đủ cột)</h2>
   <div id="genreRows"></div>
 </div>
-<!-- Modal đăng nhập từ Google Sheet! Đúng tài khoản/mật khẩu sheet Users -->
+<!-- Modal đăng nhập lấy dữ liệu từ Google Sheet tab Users -->
 <div id="loginModal" class="modal" aria-modal="true">
   <div class="modalDriveCustom" style="max-width:420px;">
     <button class="closebtn2" onclick="closeLogin()" aria-label="Đóng">&times;</button>
-    <div style="color:#ffe066;margin:12px 0 18px 0;font-size:1.15em;font-weight:700;">Đăng nhập thành viên</div>
-    <input id="loginUser" placeholder="Tài khoản..." style="margin-bottom:10px;width:95%;padding:10px;font-size:1em;" />
-    <input id="loginPass" type="password" placeholder="Mật khẩu..." style="margin-bottom:18px;width:95%;padding:10px;font-size:1em;"/>
+    <div style="color:#ffe066;margin:12px 4px 18px 4px;font-size:1.15em;font-weight:700;">Đăng nhập thành viên</div>
+    <input id="loginUser" placeholder="Tài khoản..." autocomplete="username" />
+    <input id="loginPass" type="password" placeholder="Mật khẩu..." autocomplete="current-password"/>
     <button class="btn" onclick="doLogin()" style="width:100%;">Đăng nhập</button>
-    <div class="errmsg" id="loginErr" style="display:none;margin-top:11px;color:#ee768b;font-size:.99em;"></div>
+    <div class="errmsg" id="loginErr" style="display:none;margin-top:9px;"></div>
   </div>
 </div>
-<!-- Modal player -->
 <div id="playerModal" class="modal" style="display:none;" aria-modal="true">
   <div class="modalDriveCustom" onclick="event.stopPropagation();">
     <button class="closebtn2" onclick="closePlayer()" aria-label="Đóng player phim">&times;</button>
     <div class="movie-player-plyr"><video id="plyrVideo" playsinline controls poster="" style="width:100%;" crossorigin="anonymous"></video></div>
     <div class="movie-player-iframe"><iframe id="driveFrame" style="width:100%;aspect-ratio:16/9;min-height:210px;border-radius:18px;background:#000;border:none;"></iframe></div>
-    <div class="player-toolbar" style="margin-top:14px">
-      <span id="playerTitle" class="player-title">Tên phim</span>
+    <div class="player-toolbar" style="margin-top:9px">
+      <span id="playerTitle" class="player-title"></span>
       <button class="btnshare" onclick="copyPlayerLink()" data-tip="Dán ra bất kỳ đâu để chia sẻ!">📋 Sao chép link phim</button>
     </div>
-    <div id="playerDesc" class="player-desc"></div>
+    <div id="playerFields" style="margin:18px 0 0 0;line-height:1.7;"></div>
   </div>
 </div>
 <footer class="footer-moviehub">
   <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png" alt="MovieHub Logo" class="footer-logo"/>
-  <div class="footer-content">
-    <b style="font-size:1.13em;">MovieHub</b><br>
+  <div class="footer-content"><b style="font-size:1.13em;">MovieHub</b><br>
     Đăng ký tài khoản, hỗ trợ...<br>
     Email: <a href="mailto:moviehub_vn@hotmail.com" style="color:#ffe066;text-decoration:underline;">moviehub_vn@hotmail.com</a>
   </div>
@@ -116,12 +112,12 @@ async function fetchUsers() {
   userList = (data.values||[]).map(r=>({user:r[0],pass:r[1],role:r[2]}));
 }
 function showLogin(){
-  document.getElementById('loginModal').style.display = "flex";
+  document.getElementById('loginModal').style.display = 'flex';
   document.getElementById('loginUser').value = '';
   document.getElementById('loginPass').value = '';
   document.getElementById('loginErr').style.display = 'none';
 }
-function closeLogin(){ document.getElementById('loginModal').style.display = "none"; }
+function closeLogin(){ document.getElementById('loginModal').style.display = 'none'; }
 function doLogin(){
   let user = document.getElementById('loginUser').value.trim();
   let pass = document.getElementById('loginPass').value.trim();
@@ -137,48 +133,46 @@ function doLogin(){
   }
 }
 function logoutApp(){
-  loggedUser = false;
-  renderPhim();
-  alert('Đã đăng xuất!');
+  loggedUser = false; renderPhim(); alert('Đã đăng xuất!');
 }
-function extractFileId(link) {
-  let m = link.match(/file\/d\/([a-zA-Z0-9_-]+)/) || link.match(/[?&]id=([a-zA-Z0-9_-]+)/) || link.match(/^([a-zA-Z0-9_-]{25,})$/);
-  return m ? m[1] : null;
-}
-async function getGdPlayerProxyMp4(fileId) {
-  try{
-    const api = `https://gdplayer.vip/api/video?file_id=${fileId}`;
-    const res = await fetch(api);
-    if(!res.ok) return null;
-    const dt = await res.json();
-    return dt.file;
-  }catch(e){return null;}
+function extractFileId(link){ let m=link.match(/file\/d\/([a-zA-Z0-9_-]+)/)||link.match(/[?&]id=([a-zA-Z0-9_-]+)/)||link.match(/^([a-zA-Z0-9_-]{25,})$/); return m?m[1]:null;}
+async function getGdPlayerProxyMp4(fileId){
+  try{const api=`https://gdplayer.vip/api/video?file_id=${fileId}`;const res=await fetch(api);if(!res.ok)return null;const dt=await res.json();return dt.file;}catch(e){return null;}
 }
 async function showPhim(_id){
-  let phim = phimList.find(m=>encodeURIComponent(m.id)===_id);
-  if(!phim) return alert("Không tìm thấy phim");
-  if(phim.special&&!loggedUser) { alert('Vui lòng đăng nhập để xem phim khoá!'); return; }
-  location.hash = "id=" + encodeURIComponent(phim.id);
-  let fileId = extractFileId(phim.drive);
+  let m = phimList.find(m=>encodeURIComponent(m.id)===_id);
+  if(!m) return alert("Không tìm thấy phim");
+  if(m.special && !loggedUser) { alert('Vui lòng đăng nhập để xem phim khoá!'); return;}
+  location.hash = "id=" + encodeURIComponent(m.id);
+
+  let fileId = extractFileId(m.drive);
   let modal = document.querySelector('.modalDriveCustom');
-  let poster = phim.poster||"";
   function fallbackDrivePreview() {
-    document.getElementById('driveFrame').src = fileId?`https://drive.google.com/file/d/${fileId}/preview`:phim.drive;
+    document.getElementById('driveFrame').src=fileId?`https://drive.google.com/file/d/${fileId}/preview`:m.drive;
     modal.classList.remove('show-plyr'); modal.classList.add('show-drive');
   }
+  document.getElementById('playerTitle').innerText = m.title;
+  let fields = `
+    <b>Mô tả:</b> ${m.desc||''}<br>
+    <b>Thể loại:</b> ${m.genre||''}<br>
+    <b>Năm:</b> ${m.year||''}<br>
+    <b>ID:</b> ${m.id||''}<br>
+    <b>Link Google Drive:</b> <a href="${m.drive}" target="_blank" style="color:#76fc;">Xem gốc</a><br>
+    <b>Điểm trung bình:</b> ${m.diem||''}<br>
+    <b>Comments:</b> ${m.comments||''}<br>
+    <b>Trailer:</b> ${m.trailer?`<a href=\"${m.trailer}\" target=\"_blank\" style=\"color:#fb3e\">Xem trailer</a>`:''}<br>
+    <b>Diễn viên/Đạo diễn:</b> ${m.cast||''}
+  `;
+  document.getElementById('playerFields').innerHTML = fields;
   if(fileId){
-    document.getElementById('playerTitle').innerText = phim.title;
-    document.getElementById('playerDesc').innerText = phim.desc||"";
-    document.querySelector(".movie-player-plyr").innerHTML = `<video id="plyrVideo" playsinline controls poster="${poster}" style="width:100%;" crossorigin="anonymous"></video>`;
+    document.querySelector(".movie-player-plyr").innerHTML = `<video id="plyrVideo" playsinline controls poster="${m.poster||''}" style="width:100%;" crossorigin="anonymous"></video>`;
     window.playerPlyr = new Plyr('#plyrVideo',{controls:['play-large','play','progress','current-time','duration','mute','volume','settings','fullscreen'],settings:['quality','speed','loop'],ratio:'16:9'});
     getGdPlayerProxyMp4(fileId).then(res=>{
       if(res){
         document.getElementById('plyrVideo').src = res;
         window.playerPlyr.source = {type:"video",sources:[{src:res,type:'video/mp4',size:720}]};
         modal.classList.remove('show-drive'); modal.classList.add('show-plyr');
-      }else{
-        fallbackDrivePreview();
-      }
+      }else fallbackDrivePreview();
     }).catch(fallbackDrivePreview);
   }else{
     fallbackDrivePreview();
@@ -186,36 +180,52 @@ async function showPhim(_id){
   document.getElementById('playerModal').style.display = 'flex';
 }
 function closePlayer(){
-  document.getElementById('driveFrame').src='';
-  if(window.playerPlyr) window.playerPlyr.pause();
+  document.getElementById('driveFrame').src='';if(window.playerPlyr) window.playerPlyr.pause();
   document.getElementById('playerModal').style.display='none';
   document.querySelector('.modalDriveCustom').classList.remove('show-drive','show-plyr');
   history.replaceState(null, null, window.location.pathname);
 }
 function copyPlayerLink() {
   let link = window.location.origin + window.location.pathname + location.hash;
-  navigator.clipboard.writeText(link);
-  alert("Đã sao chép link phim: " + link);
+  navigator.clipboard.writeText(link); alert("Đã sao chép link phim: "+link);
 }
 function toggleTheme() {
-  const body = document.body;
+  const body=document.body;
   if(body.classList.contains("lightmode")){
     body.classList.remove("lightmode");
-    document.getElementById('themeToggle').innerText = '🌙';
+    document.getElementById('themeToggle').innerText='🌙';
     localStorage.setItem("moviehub_theme",'dark');
-  } else {
+  }else{
     body.classList.add("lightmode");
-    document.getElementById('themeToggle').innerText = '☀️';
+    document.getElementById('themeToggle').innerText='☀️';
     localStorage.setItem("moviehub_theme",'light');
   }
+}
+async function fetchUsers(){
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${USERS_RANGE}?key=${API_KEY}`;
+  let res = await fetch(url); let data = await res.json();
+  userList = (data.values||[]).map(r=>({user:r[0],pass:r[1],role:r[2]}));
 }
 async function fetchPhim() {
   let url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_RANGE}?key=${API_KEY}`;
   let res = await fetch(url); let data = await res.json();
   let rows = data.values||[], header = rows[0];
   let idx = n => header.findIndex(x=>x&&x.trim().toLowerCase() === n);
-  phimList = rows.slice(1).map(row=>(
-    {title:row[idx('tên phim')]||'',desc:row[idx('mô tả')]||'',genre:row[idx('thể loại')]||'Khác',drive:row[idx('link google drive')]||'',poster:row[idx('link poster')]||'',year:row[idx('năm')]||'',id:row[idx('id')]||row[idx('tên phim')]||'',special:(row[idx('special')]||'').trim().toLowerCase()==='yes',isNew:row[idx('năm')]&&+row[idx('năm')] >= (new Date().getFullYear()-1)})).filter(m=>m.title);
+  phimList = rows.slice(1).map(row=>({
+    title:row[idx('tên phim')]||'',
+    desc:row[idx('mô tả')]||'',
+    genre:row[idx('thể loại')]||'',
+    year:row[idx('năm')]||'',
+    id:row[idx('id')]||'',
+    drive:row[idx('link google drive')]||'',
+    poster:row[idx('link poster')]||'',
+    special:(row[idx('special')]||'').trim().toLowerCase()==='yes',
+    diem:row[idx('điểm trung bình')]||'',
+    comments:row[idx('comments')]||'',
+    trailer:row[idx('trailer')]||'',
+    cast:row[idx('diễn viên/đạo diễn')]||'',
+    isNew: row[idx('năm')] && +row[idx('năm')] >= (new Date().getFullYear()-1)
+  })).filter(m=>m.title);
   genresSet = new Set(phimList.map(m=>m.genre).filter(g=>g&&g!==''));
   updateGenreOptions();renderPhim();
 }
@@ -239,7 +249,13 @@ function renderPhim() {
         ${m.special?'<span class="badge-locked">Khoá</span>':''}
         <img class="phimimg" src="${m.poster||'https://img.icons8.com/color/480/movie-projector.png'}" alt="">
         <div class="phimtitle">${m.title}</div>
-        <div class="phimmeta">${m.genre||'Chưa rõ'} | ${m.year||''}</div>
+        <div class="phimmeta">Thể loại: ${m.genre||'Chưa rõ'} | Năm: ${m.year||''}</div>
+        <div class="phimid">ID: ${m.id||''}</div>
+        <div class="phimdesc">${m.desc||''}</div>
+        ${m.diem?`<div class="phimrate">⭐ Điểm: ${m.diem}</div>`:''}
+        ${m.trailer?`<div class="phimtr">🎬 Trailer: <a href="${m.trailer}" target="_blank" style="color:#f7b;">Xem trailer</a></div>`:''}
+        ${m.cast?`<div class="phimcast">👤 Diễn viên/Đạo diễn: ${m.cast}</div>`:''}
+        ${m.comments?`<div class="phimcmt">💬 ${m.comments}</div>`:''}
         <button class="btn watchbtn${m.special&&!loggedUser?' locked':''}" tabindex="-1" onclick="event.stopPropagation();showPhim('${encodeURIComponent(m.id)}')">
           ${m.special&&!loggedUser?'Chỉ thành viên':'Xem phim'}
         </button>
