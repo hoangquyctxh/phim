@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
-  <title>MovieHub – Hệ thống phát phim tập/1 tập, fix phát Drive preview</title>
+  <title>MovieHub – Tự động gom tập phim từ Google Sheet</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=yes"/>
   <meta name="theme-color" content="#151324"/>
   <link rel="icon" type="image/svg+xml" href="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png">
@@ -23,7 +23,7 @@
     .phimcard{flex:0 1 265px;max-width:265px;background:var(--card);border-radius:21px;box-shadow:0 6px 24px #13142b7a;overflow:hidden;display:flex;flex-direction:column;position:relative;transition:.16s;cursor:pointer;}
     .phimcard:hover{transform:scale(1.045) translateY(-8px);box-shadow:0 17px 45px #e5091456,0 4px 22px #1e1e4680;}
     .phimimg{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;}
-    .badge-new{position:absolute;left:13px;top:13px;background:var(--acc);color:#fff;padding:2.5px 15px;border-radius:13px;font-weight:700;font-size:1.07em;box-shadow:0 1px 4px #fa555533;}
+    .badge-new{position:absolute;left:13px;top:13px;background:var(--acc);color:#fff;padding:2.5px 15px;border-radius:13px;font-weight:700;font-size:1.07em;}
     .badge-locked{background:var(--acc2);color:var(--acc);position:absolute;right:13px;top:15px;padding:2px 12.5px;border-radius:11px;font-weight:900;font-size:1.02em;}
     .phimtitle{margin:15px 15px 3px 17px;font-size:1.17em;font-weight:800;}
     .phimmeta{font-size:.98em;color:var(--acc2);margin:0 18px 7px;}
@@ -51,7 +51,7 @@
   <button id="themeToggle" class="btn" onclick="toggleTheme()" aria-label="Đổi theme">🌙</button>
 </header>
 <div class="container">
-  <h2 style="font-size:1.35em;font-weight:900;padding:0 0 18px 0;">Danh sách phim mới · hỗ trợ chọn tập</h2>
+  <h2 style="font-size:1.35em;font-weight:900;padding:0 0 18px 0;">Danh sách phim – MovieHub tự gom tập phim từ Google Sheet, không cần JSON</h2>
   <div id="genreRows" class="moviegrid"></div>
 </div>
 <div id="toastMsg" class="toast" aria-live="assertive"></div>
@@ -66,13 +66,14 @@
 </div>
 <footer class="footer-moviehub">
   <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png" alt="MovieHub Logo" class="footer-logo"/>
-  <div class="footer-content">MovieHub &copy; 2025 – Giao diện chuẩn, không che ảnh</div>
+  <div class="footer-content">MovieHub &copy; 2025 – Tự động nhận tập phim từ Sheet, không cần lập trình!</div>
 </footer>
 <script>
-const SHEET_ID = '15mFrve7Z-_zi_7AvSq3t9Nti1VjINVHCQDF7LRmP1QQ';
+const SHEET_ID = '1G05UujE_YLzRBsIsBNmjthS3MrAzza5rdc6RQyNbmX';
 const API_KEY = 'AIzaSyD5dWLgYZPu1_-AkwAaHPClGOOQ-Lq5EGI';
 const SHEET_RANGE = 'Sheet1!A1:Z';
-let phimList = [], genresSet = new Set();
+
+let phimFullList = [], phimList = [], genresSet = new Set();
 
 function showToast(msg, dur = 2100){
   let t = document.getElementById('toastMsg');
@@ -81,68 +82,61 @@ function showToast(msg, dur = 2100){
 }
 function toggleTheme(){document.body.classList.toggle("lightmode");}
 
+// CHUẨN HOÁ LINK
 function normalizeDriveLink(lk){
   if(!lk) return "";
   return lk.replace(/\/view(\?.*)?$/,"/preview").replace(/\/edit(\?.*)?$/,"/preview").replace(/\s/g,"");
 }
 
-// Lấy dữ liệu, tự động chuẩn hóa drive link preview
-async function fetchPhimFromSheet() {
+// Đọc sheet: mỗi dòng 1 tập - tự động gom thành bộ phim!
+async function fetchPhimFromSheet(){
   let url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_RANGE}?key=${API_KEY}`;
   let res = await fetch(url); let data = await res.json();
   let rows = data.values || [], header = rows[0];
-  let idx = name => {
-    let i = header.findIndex(c => c && c.toLowerCase().replace(/\s+/g, '') === name.toLowerCase().replace(/\s+/g, ''));
-    return i >= 0 ? i : undefined;
-  };
-  phimList = rows.slice(1).map(row => {
-    let item = {};
+  let col = n => { let i=header.findIndex(h=>h.trim().toLowerCase()==n); return i>=0?i:-1; };
+
+  // CHUYỂN VỀ object danh sách từng dòng-tập
+  let list = rows.slice(1).map(row=>{
+    let obj = {};
     header.forEach((h,i)=>{
-      let col = (row[i]||"").trim();
-      if(h.toLowerCase().includes('special')) col = (col||'').toLowerCase()==="yes"||col==="1"||col==="true";
-      // Chuẩn hóa episodes: xoá dấu xuống dòng, ép về 1 dòng
-      if(h.toLowerCase().includes('episodes') && col) {
-        col = col.replace(/\r?\n/g, "");
-        if(col.startsWith("[{")) try{
-          let arr = JSON.parse(col);
-          arr = arr.map(e=>({...e,drive:normalizeDriveLink(e.drive)}));
-          col = arr;
-        }catch(e){col=[];}
-      }
-      // Phim lẻ: tự chuẩn hoá link ở cột Link Google Drive
-      if(h.toLowerCase().includes('link google drive')) col = normalizeDriveLink(col);
-      item[h.trim().toLowerCase()] = col;
+      let val = (row[i]||"").trim();
+      if(h.toLowerCase().includes('link google drive')) val = normalizeDriveLink(val);
+      obj[h.trim()] = val;
     });
-    // Normalize lại key phổ biến
-    item.id = item['id']||item['tên phim']||item['title'];
-    item.title = item['title']||item['tên phim']||"";
-    item.desc = item['desc']||item['mô tả']||"";
-    item.genre = item['genre']||item['thể loại']||"";
-    item.year = item['year']||item['năm']||"";
-    item.poster = item['poster']||item['link poster']||"";
-    item.cast = item['diễn viên/đạo diễn']||item['cast']||"";
-    item.episodes = item['episodes'];
-    item.special = item['special'];
-    item.trailer = item['trailer']||"";
-    item.comments = item['comments']||"";
-    item.rating = item['điểm trung bình']||"";
-    // Nếu không có episodes và có link google drive thì ép thành episodes 1 tập để unified player
-    if(!item.episodes && item['link google drive']){
-      item.episodes = [{ep:1, title:item.title, drive:item['link google drive']}];
-    }
-    return item;
-  }).filter(m => m.title||m.id);
+    return obj;
+  }).filter(m=>m["Tên phim"]||m["ID"]);
+  phimFullList = list;
+
+  // GOM các dòng thành bộ phim/tập
+  let phimGom = {};
+  list.forEach(item=>{
+    let id = item["ID"]||item["Tên phim"];
+    if(!phimGom[id]) phimGom[id] = {
+      id:id, title: item["Tên phim"], desc:item["Mô tả"], genre:item["Thể loại"], year:item["Năm"],
+      poster:item["Link poster"], special:item["Special"], cast:item["Diễn viên/Đạo diễn"], comments:item["Comments"],
+      rating:item["Điểm trung bình"], trailer:item["Trailer"], episodes:[]
+    };
+    // Gộp mỗi dòng là 1 tập phim
+    let epNum = Number(item["Tập"]||1);
+    phimGom[id].episodes.push({
+      ep:epNum, title:item["Mô tả"]||("Tập "+epNum), drive:item["Link Google Drive"], poster:item["Link poster"]||""
+    });
+    genresSet.add(item["Thể loại"]);
+  });
+  // Bỏ những phim chỉ có link nhưng không hợp lệ
+  phimList = Object.values(phimGom).filter(m=>m.episodes.filter(e=>!!e.drive).length>0);
   renderPhim();
 }
 
 function renderPhim(){
   let html = '';
   phimList.forEach(m => {
-    let isSeries = Array.isArray(m.episodes) && m.episodes.length>1;
+    let isSeries = m.episodes.length>1;
+    let poster = m.poster||m.episodes[0].poster||'https://img.icons8.com/color/480/movie-projector.png';
     html += `<div class="phimcard" onclick="showPhim('${m.id}',1)">
       <span class="badge-new" style="${m.year >= (new Date().getFullYear()-1)?'':'display:none'}">MỚI</span>
       ${m.special?'<span class="badge-locked">Khoá</span>':''}
-      <img class="phimimg" src="${m.poster||'https://img.icons8.com/color/480/movie-projector.png'}" alt="Phim: ${m.title}">
+      <img class="phimimg" src="${poster}" alt="Phim: ${m.title}">
       <div class="phimtitle">${m.title}</div>
       <div class="phimmeta">${m.genre||'?'}, ${m.year||''}</div>
       <div class="phimdesc">${m.desc||''}</div>
@@ -158,16 +152,12 @@ function copyPlayerLink(){
 }
 
 function showPhim(_id, ep=1) {
-  let m = phimList.find(x => x.id === _id || encodeURIComponent(x.id) === _id);
+  let m = phimList.find(x => String(x.id) === String(_id));
   if (!m) return showToast("Không tìm thấy phim!");
-  let epList = Array.isArray(m.episodes) ? m.episodes : [];
-  if (typeof m.episodes === 'string' && m.episodes.startsWith('[')) {
-    try { epList = JSON.parse(m.episodes); } catch(e){ epList = []; }
-  }
-  let isSeries = epList.length > 1;
-  let epObj = epList.find(e=>e.ep==ep) || epList[0] || {};
-  window.location.hash = isSeries ? `id=${encodeURIComponent(m.id)}&ep=${epObj.ep||1}` : `id=${encodeURIComponent(m.id)}`;
-  document.getElementById('playerTitle').innerText = isSeries ? `${m.title} – Tập ${epObj.ep}` : m.title;
+  let epList = m.episodes || [];
+  let epObj = epList.find(e=>String(e.ep)==String(ep)) || epList[0] || {};
+  window.location.hash = epList.length>1 ? `id=${encodeURIComponent(m.id)}&ep=${epObj.ep||1}` : `id=${encodeURIComponent(m.id)}`;
+  document.getElementById('playerTitle').innerText = epList.length>1 ? `${m.title} – Tập ${epObj.ep}` : m.title;
   document.getElementById('playerFields').innerHTML = [
     `<div><b>Mô tả:</b> ${m.desc||''}</div>`,
     `<div><b>Năm:</b> ${m.year||''}</div>`,
@@ -175,10 +165,9 @@ function showPhim(_id, ep=1) {
     m.cast ? `<div><b>Diễn viên:</b> ${m.cast}</div>` : '',
     m.comments ? `<div><b>Bình luận:</b> ${m.comments}</div>`:"",
     m.trailer ? `<div><b>Trailer:</b> <a href="${m.trailer}" target="_blank" style="color:#ffe066">Xem trailer</a></div>`:"",
-    isSeries ? `<div id="episodePicker">${
+    epList.length>1 ? `<div id="episodePicker">${
       epList.map(e=>`<button onclick="showPhim('${m.id}',${e.ep})" class="btn${e.ep==epObj.ep?' watchbtn-ep-active':''}">Tập ${e.ep}</button>`).join('')
-    }</div>` : '',
-    epObj.drive?`<div><b>Link Google Drive:</b> <a href="${epObj.drive}" target="_blank" style="color:#ffe066;">Mở link gốc</a></div>`:''
+    }</div>` : ''
   ].join('');
   let ifr = document.getElementById('driveFrame');
   if (epObj.drive && epObj.drive.includes("https://drive.google.com/")) {
@@ -208,4 +197,3 @@ window.addEventListener("hashchange", () => {
 </script>
 </body>
 </html>
-
