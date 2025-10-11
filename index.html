@@ -2,22 +2,22 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
-  <title>MovieHub – Xem phim nhiều tập, đăng nhập xem tập khoá</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=yes"/>
-  <meta name="theme-color" content="#151324"/>
-  <link rel="icon" type="image/svg+xml" href="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png">
+  <title>MovieHub – Xem phim, khoá tập, Việt hoá đẹp</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css"/>
+  <meta name="theme-color" content="#151324"/>
+  <link rel="icon" type="image/svg+xml" href="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png">
   <style>
-    body{font-family:'Be Vietnam Pro',sans-serif;background:#151324;margin:0;color:#fff;}
-    header{display:flex;align-items:center;gap:22px;height:70px;padding:0 3vw 0 0;background:linear-gradient(87deg,#181843 88%,#af1e36 121%);}
+    body{font-family:'Be Vietnam Pro',sans-serif;background:#181843;margin:0;color:#fff;}
+    header{display:flex;align-items:center;gap:22px;height:70px;padding:0 3vw 0 0;background:linear-gradient(87deg,#181843 88%,#af1e36 111%);}
     .logo{height:45px;width:45px;background:#fff;object-fit:cover;border-radius:16px;margin:0 17px;}
     .title{font-size:2em;font-weight:900;color:#e50914;letter-spacing:1px;}
     .searchbox{padding:10px 19px;font-size:1.07em;border-radius:9px;border:none;outline:none;background:rgba(41,44,82,.88);color:#fff;margin-right:18px;min-width:200px;}
-    #genreFilter{padding:10px 15px;border-radius:8px;background:#1f1c36dd;color:#ffe066;font-size:1em;margin-right:17px;}
-    .btn{padding:8px 23px;font-weight:900;font-family:'Be Vietnam Pro',sans-serif;border:none;border-radius:11px;background:#e50914;color:#fff;}
-    .btn-link{background:none;color:#ffe066;padding:0 10px;text-decoration:underline;border:none;}
-    .container{max-width:1200px;margin:0 auto;padding:38px 4vw 88px 4vw;}
+    .btn{padding:9px 21px;font-weight:900;font-family:'Be Vietnam Pro',sans-serif;border:none;border-radius:11px;background:#e50914;color:#fff;}
+    .loginbar{margin-left:auto;display:flex;align-items:center;gap:16px;}
+    .user-name{font-weight:900;font-size:1em;display:inline-block;margin-right:7px;}
+    .container{max-width:1200px;margin:0 auto;padding:36px 4vw 88px 4vw;}
     .moviegrid{display:flex;flex-wrap:wrap;gap:36px;justify-content:flex-start;}
     .phimcard{flex:0 1 265px;max-width:265px;background:#22223D;border-radius:21px;box-shadow:0 6px 24px #13142b7a;overflow:hidden;display:flex;flex-direction:column;position:relative;transition:.16s;cursor:pointer;}
     .phimcard:hover{transform:scale(1.045) translateY(-8px);box-shadow:0 17px 45px #e5091456;}
@@ -30,30 +30,28 @@
     .phimcast{color:#b6fddf;font-size:.98em;margin:0 0 7px 16px;}
     .watchbtn{margin:10px 0 17px 20px;padding:8px 21px;}
     .btn.watchbtn-ep-active{background: #ffe066 !important;color: #e50914 !important;font-weight:900;border:2px solid #ffe06644;transform:scale(1.13);}
-    .modal{position:fixed;inset:0;background:rgba(16,13,29,.84);backdrop-filter:blur(9px);display:flex;align-items:center;justify-content:center;z-index:9000;}
-    .modalDriveCustom{background:#221e38;border-radius:28px;box-shadow:0 10px 53px #15142569;padding:29px 22px 19px 23px;max-width:540px;width:99vw;position:relative;}
+    .modal{position:fixed;inset:0;background:rgba(16,13,29,.87);backdrop-filter:blur(9px);display:flex;align-items:center;justify-content:center;z-index:9000;}
+    .modalDriveCustom{background:#221e38;border-radius:28px;box-shadow:0 10px 53px #15142569;padding:29px 22px 19px 23px;max-width:540px;width:98vw;position:relative;}
     .closebtn2{position:absolute;right:13px;top:13px;background:#e50914;color:#fff;border:none;border-radius:14px;padding:9px 16px;font-size:1.25em;}
     .movie-player-iframe{margin-bottom:14px;width:100%;}
     #playerFields{margin:19px 1px 0 7px;}
     #episodePicker{margin:10px 0;display:flex;gap:10px;flex-wrap:wrap;}
-    .loginbar{margin-left:auto;display:flex;align-items:center;gap:16px;}
-    .user-name{font-weight:900;font-size:1em;display:inline-block;margin-right:9px;}
     .toast{position:fixed;right:24px;bottom:17px;z-index:39000;background:linear-gradient(90deg,#191b20 80%,#ffe066 102%);color:#e50914;padding:11px 21px 11px 13px;border-radius:9px;font-size:1.09em;box-shadow:0 2px 12px #3223;display:none;}
-    .footer-moviehub{background:#1a1a24;color:#ecdcbc;text-align:center;padding:14px 4vw 13px 4vw;margin-top:44px;font-size:1.07em;}
+    .footer-moviehub{background:#1a1a24;color:#ecdcbc;text-align:center;padding:13px 3vw 13px 3vw;margin-top:44px;}
+    .footer-logo{height:26px;opacity:.97;}
   </style>
 </head>
 <body>
 <header>
   <img class="logo" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png" alt="MovieHub Logo"/>
   <span class="title">MovieHub</span>
-  <input class="searchbox" id="quickSearch" placeholder="Tìm phim/Tìm diễn viên..."/>
   <div class="loginbar" id="loginBar">
     <button class="btn" onclick="location.href='dang-nhap.html'">Đăng nhập</button>
     <button class="btn" onclick="location.href='dang-ky.html'">Đăng ký</button>
   </div>
 </header>
 <div class="container">
-  <h2 style="font-size:1.35em;font-weight:900;padding:0 0 18px 0;">Danh sách phim MovieHub – Đăng nhập để xem phim nhiều tập khoá</h2>
+  <h2 style="font-size:1.31em;font-weight:900;padding:0 0 18px 0;">Danh sách phim MovieHub – Đăng nhập để xem tập khoá</h2>
   <div id="genreRows" class="moviegrid"></div>
 </div>
 <div id="toastMsg" class="toast" aria-live="assertive"></div>
@@ -68,10 +66,10 @@
 </div>
 <footer class="footer-moviehub">
   <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png" alt="MovieHub Logo" class="footer-logo"/>
-  <div class="footer-content">MovieHub &copy; 2025 – Đăng nhập/đăng ký để xem phim khoá</div>
+  <div class="footer-content">MovieHub &copy; 2025 – Xem phim nhiều tập, tiếng Việt hóa, không lỗi!</div>
 </footer>
 <script>
-const SHEET_ID = '15mFrve7Z-_zi_7AvSq3t9Nti1VjINVHCQDF7LRmP1QQ';
+const SHEET_ID = '1G05UujE_YLzRBsIsBNmjthS3MrAzza5rdc6RQyNbmX';
 const API_KEY = 'AIzaSyD5dWLgYZPu1_-AkwAaHPClGOOQ-Lq5EGI';
 const SHEET_RANGE = 'Sheet1!A1:Z';
 let phimList = [], genresSet = new Set();
@@ -104,20 +102,19 @@ function logout(){
   showToast("Bạn đã đăng xuất!");
 }
 
+// CHỈ thêm card phim thực sự hợp lệ (tên, có poster, có tập có link drive)
 async function fetchPhimFromSheet(){
   let url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_RANGE}?key=${API_KEY}`;
   let res = await fetch(url); let data = await res.json();
   let rows = data.values || [], header = rows[0];
-  let col = n => { let i=header.findIndex(h=>h.trim().toLowerCase()==n); return i>=0?i:-1; };
   let list = rows.slice(1).map(row=>{
-    let obj = {};
-    header.forEach((h,i)=>{
+    let obj={};header.forEach((h,i)=>{
       let val = (row[i]||"").trim();
       if(h.toLowerCase().includes('link google drive')) val = normalizeDriveLink(val);
       obj[h.trim()] = val;
-    });
-    return obj;
+    });return obj;
   }).filter(m=>m["Tên phim"]||m["ID"]);
+  // Gom các dòng cùng ID thành 1 phim
   let phimGom = {};
   list.forEach(item=>{
     let id = item["ID"]||item["Tên phim"];
@@ -132,14 +129,15 @@ async function fetchPhimFromSheet(){
     });
     genresSet.add(item["Thể loại"]);
   });
-  phimList = Object.values(phimGom).filter(m=>m.episodes.filter(e=>!!e.drive).length>0);
+  // **Chỉ lấy phim đủ poster, tên, có tập hợp lệ**
+  phimList = Object.values(phimGom).filter(m=>{
+    let poster = (m.poster && m.poster.includes("http")) || (m.episodes[0] && m.episodes[0].poster && m.episodes[0].poster.includes("http"));
+    let validEp = m.episodes && m.episodes.some(ep=>ep.drive && ep.drive.startsWith("https://drive.google.com"));
+    return poster && (m.title||m.id) && validEp;
+  });
   renderPhim();
 }
 
-<!-- Xem lại phần trên, chỉ gửi phần fix quan trọng nhất -->
-
-<script>
-// ... biến cài sẵn
 function renderPhim(){
   let html = '';
   phimList.forEach(m => {
@@ -148,7 +146,7 @@ function renderPhim(){
       : (m.episodes[0] && m.episodes[0].poster && m.episodes[0].poster.includes("http")) 
       ? m.episodes[0].poster : null;
     let valid = (m.title||m.id) && poster && m.episodes.some(ep=>ep.drive && ep.drive.startsWith('https://drive.google.com'));
-    if(!valid) return; // Bỏ phim/tập lỗi
+    if(!valid) return;
     let anyLocked = m.episodes.some(ep=>String(ep.special).toLowerCase()==="yes"||String(ep.special)==="1"||String(ep.special)=="true");
     html += `<div class="phimcard" onclick="showPhim('${m.id}',1)">
       <span class="badge-new" style="${m.year >= (new Date().getFullYear()-1)?'':'display:none'}">MỚI</span>
@@ -162,7 +160,6 @@ function renderPhim(){
   });
   document.getElementById('genreRows').innerHTML = html;
 }
-</script>
 
 function copyPlayerLink(){
   navigator.clipboard.writeText(window.location.origin+window.location.pathname+window.location.hash);
@@ -191,7 +188,7 @@ function showPhim(_id, ep=1) {
     m.comments ? `<div><b>Bình luận:</b> ${m.comments}</div>`:"",
     m.trailer ? `<div><b>Trailer:</b> <a href="${m.trailer}" target="_blank" style="color:#ffe066">Xem trailer</a></div>`:"",
     epList.length>1 ? `<div id="episodePicker">${
-      epList.map(e=>`<button onclick="showPhim('${m.id}',${e.ep})" class="btn${e.ep==epObj.ep?' watchbtn-ep-active':''}${String(e.special).toLowerCase()==='yes'||String(e.special)==="1"||String(e.special)=="true"?' badge-locked':''}">${e.special?"🔒 ":""}Tập ${e.ep}</button>`).join('')
+      epList.map(e=>`<button onclick="showPhim('${m.id}',${e.ep})" class="btn${e.ep==epObj.ep?' watchbtn-ep-active':''}${String(e.special).toLowerCase()==='yes'||String(e.special)=="1"||String(e.special)=="true"?' badge-locked':''}">${e.special?"🔒 ":""}Tập ${e.ep}</button>`).join('')
     }</div>` : ''
   ].join('');
   let ifr = document.getElementById('driveFrame');
@@ -209,6 +206,7 @@ function closePlayer(){
   history.replaceState(null,null,window.location.pathname);
 }
 
+// KHỞI TẠO
 window.onload = () => {
   setLoginBar();
   fetchPhimFromSheet();
@@ -224,5 +222,3 @@ window.addEventListener("hashchange", () => {
 </script>
 </body>
 </html>
-
-
