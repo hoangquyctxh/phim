@@ -2,50 +2,41 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
-  <title>MovieHub – Giao diện pro, nhiều tập, che nhạy cảm tự động</title>
+  <title>MovieHub – Chuẩn UI phim nhiều tập</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=yes"/>
   <meta name="theme-color" content="#151324"/>
   <link rel="icon" type="image/svg+xml" href="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png">
   <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;800&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#151324;--card:#22223D;--acc:#e50914;--acc2:#ffe066;--danger:#ff5864;}
+    :root{--bg:#151324;--card:#22223D;--acc:#e50914;--acc2:#ffe066;}
     body{background:var(--bg);margin:0;color:#fff;font-family:'Manrope',Arial,sans-serif;}
     header{display:flex;align-items:center;gap:22px;height:70px;padding:0 3vw 0 0;background:linear-gradient(87deg,#181843 88%,#af1e36 121%);}
     .logo{height:45px;width:45px;background:#fff;object-fit:cover;border-radius:16px;margin:0 17px;}
-    .title{font-size:2em;font-weight:900;color:var(--acc);flex:0;}
+    .title{font-size:2em;font-weight:900;color:var(--acc);}
     .searchbox{padding:10px 19px;font-size:1.07em;border-radius:9px;border:none;outline:none;background:rgba(41,44,82,.88);color:#fff;margin-right:18px;min-width:200px;}
     #genreFilter{padding:10px 15px;border-radius:8px;background:#1f1c36dd;color:var(--acc2);font-size:1em;margin-right:17px;}
     .btn{padding:8px 23px;font-weight:900;border:none;border-radius:11px;background:var(--acc);color:#fff;}
     .container{max-width:1200px;margin:0 auto;padding:38px 4vw 88px 4vw;}
     .moviegrid{display:flex;flex-wrap:wrap;gap:36px;justify-content:flex-start;}
-    @media (max-width:900px){.moviegrid{gap:16px;.container{padding:15px 1vw 30vw 1vw;}}}
+    @media (max-width:900px){.moviegrid{gap:16px;}}
     .phimcard{flex:0 1 265px;max-width:265px;background:var(--card);border-radius:21px;box-shadow:0 6px 24px #13142b7a;overflow:hidden;display:flex;flex-direction:column;position:relative;transition:.16s;cursor:pointer;}
     .phimcard:hover{transform:scale(1.045) translateY(-8px);box-shadow:0 17px 45px #e5091456,0 4px 22px #1e1e4680;}
     .phimimg{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;}
-    .phimimg.blur{filter:blur(12px) brightness(1.1) grayscale(0.15);}
     .badge-new{position:absolute;left:13px;top:13px;background:var(--acc);color:#fff;padding:2.5px 15px;border-radius:13px;font-weight:700;font-size:1.07em;box-shadow:0 1px 4px #fa555533;}
     .badge-locked{background:var(--acc2);color:var(--acc);position:absolute;right:13px;top:15px;padding:2px 12.5px;border-radius:11px;font-weight:900;font-size:1.02em;}
-    .badge-nc{position:absolute;left:18px;bottom:15px;background:var(--danger);color:#fff;font-weight:900;padding:2.5px 13px;border-radius:11px;}
     .phimtitle{margin:15px 15px 3px 17px;font-size:1.17em;font-weight:800;}
     .phimmeta{font-size:.98em;color:var(--acc2);margin:0 18px 7px;}
     .phimdesc{color:#fde9c8;margin:0 16px 8px;}
     .phimcast{color:#b6fddf;font-size:.98em;margin:0 0 7px 16px;}
     .watchbtn{margin:10px 0 17px 20px;padding:8px 21px;}
-    .btn.watchbtn-ep-active{background: #ffe066 !important;color: #e50914 !important;font-weight: 900;
-      border: 2px solid #ffe06644;transform: scale(1.13);}
-    /* Blur overlay for nhạy cảm */
-    .blur-overlay{position:absolute;inset:0;background:rgba(30,16,41,.59);border-radius:18px;z-index:9;display:flex;align-items:center;justify-content:center;font-size:1.3em;font-weight:900;color:#fff;backdrop-filter:blur(7px);}
-    /* Modal */
-    .modal{position:fixed;inset:0;background:rgba(16,13,29,.84);backdrop-filter:blur(9px);
-      display:flex;align-items:center;justify-content:center;z-index:9000;}
+    .btn.watchbtn-ep-active{background: #ffe066 !important;color: #e50914 !important;font-weight: 900;border: 2px solid #ffe06644;transform: scale(1.13);}
+    .modal{position:fixed;inset:0;background:rgba(16,13,29,.84);backdrop-filter:blur(9px);display:flex;align-items:center;justify-content:center;z-index:9000;}
     .modalDriveCustom{background:linear-gradient(144deg,#25223a 81%,#181834 131%);border-radius:28px;box-shadow:0 10px 53px #15142569;padding:29px 22px 19px 23px;max-width:540px;width:99vw;position:relative;}
     .closebtn2{position:absolute;right:13px;top:13px;background:var(--acc);color:#fff;border:none;border-radius:14px;padding:9px 16px;font-size:1.25em;}
     .movie-player-iframe{margin-bottom:14px;width:100%;}
     #playerFields{margin:19px 1px 0 7px;}
-    /* Episode picker nút hàng ngang */
     #episodePicker{margin:10px 0;display:flex;gap:10px;flex-wrap:wrap;}
-    /* Toast, footer ... giữ nguyên */
     .toast{position:fixed;right:24px;bottom:17px;z-index:39000;background:linear-gradient(90deg,#191b20 80%,#ffe066 102%);color:#e50914;padding:11px 21px 11px 13px;border-radius:9px;font-size:1.09em;box-shadow:0 2px 12px #3223;display:none;font-weight:800;}
     .footer-moviehub{background:#1a1a24;color:#ecdcbc;text-align:center;padding:14px 4vw 13px 4vw;margin-top:44px;font-size:1.07em;}
     .footer-logo{height:29px;opacity:.97;}
@@ -60,11 +51,11 @@
   <button id="themeToggle" class="btn" onclick="toggleTheme()" aria-label="Đổi theme">🌙</button>
 </header>
 <div class="container">
-  <h2 style="font-size:1.35em;font-weight:900;padding:0 0 18px 0;">Danh sách phim mới · hỗ trợ chọn tập, che nhạy cảm tự động</h2>
+  <h2 style="font-size:1.35em;font-weight:900;padding:0 0 18px 0;">Danh sách phim mới · hỗ trợ chọn tập</h2>
   <div id="genreRows" class="moviegrid"></div>
 </div>
 <div id="toastMsg" class="toast" aria-live="assertive"></div>
-<!-- Tiếp đến phần player/modal/js -->
+
 <div id="playerModal" class="modal" style="display:none;" aria-modal="true">
   <div class="modalDriveCustom">
     <button class="closebtn2" onclick="closePlayer()" aria-label="Đóng player phim">&times;</button>
@@ -76,26 +67,20 @@
 </div>
 <footer class="footer-moviehub">
   <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png" alt="MovieHub Logo" class="footer-logo"/>
-  <div class="footer-content">MovieHub &copy; 2025 – Giao diện premium, che nhạy cảm tự động</div>
+  <div class="footer-content">MovieHub &copy; 2025 – Giao diện chuẩn, không che ảnh</div>
 </footer>
 <script>
-const SHEET_ID = '15mFrve7Z-_zi_7AvSq3t9Nti1VjINVHCQDF7LRmP1QQ';
+const SHEET_ID = '1G05UujE_YLzRBsIsBNmjthS3MrAzza5rdc6RQyNbmX';
 const API_KEY = 'AIzaSyD5dWLgYZPu1_-AkwAaHPClGOOQ-Lq5EGI';
 const SHEET_RANGE = 'Sheet1!A1:Z';
 let phimList = [], genresSet = new Set();
+
 function showToast(msg, dur = 2100){
   let t = document.getElementById('toastMsg');
   t.textContent = msg; t.style.display = "block";
   setTimeout(() => t.style.display = "none", dur);
 }
 function toggleTheme(){document.body.classList.toggle("lightmode");}
-
-// THUẬT TOÁN PHÁT HIỆN NHẠY CẢM: tag đặc biệt/cột đặc biệt hoặc tên chứa "jav,18+,sex,nsfw,..."
-function isBlurPhim(m){
-  let tn = (m.title||"")+","+(m.desc||"")+","+(m.genre||"");
-  if((m.special && String(m.special).toLowerCase()!=='false') || /(jav|porn|18\+|sex|nsfw|nhạy cảm|hschool|yaoi|hentai|xxx)/i.test(tn)) return true;
-  return false;
-}
 
 async function fetchPhimFromSheet() {
   let url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_RANGE}?key=${API_KEY}`;
@@ -127,7 +112,6 @@ async function fetchPhimFromSheet() {
     item.trailer = item['trailer']||"";
     item.comments = item['comments']||"";
     item.rating = item['điểm trung bình']||"";
-    item.isBlur = isBlurPhim(item);
     return item;
   }).filter(m => m.title||m.id);
   genresSet = new Set(phimList.map(m=>m.genre).filter(Boolean));
@@ -141,8 +125,7 @@ function renderPhim(){
       ${m.rating?`<div style="position:absolute;top:13px;left:48px;background:rgba(0,0,0,0.5);color:#ffe066;padding:2px 9px 2px 6px;border-radius:12px 0 10px 8px;">★ ${m.rating}</div>`:""}
       <span class="badge-new" style="${m.year >= (new Date().getFullYear()-1)?'':'display:none'}">MỚI</span>
       ${m.special?'<span class="badge-locked">Khoá</span>':''}
-      <img class="phimimg${m.isBlur?' blur':''}" src="${m.poster||'https://img.icons8.com/color/480/movie-projector.png'}" alt="Phim: ${m.title}">
-      ${m.isBlur?'<div class="blur-overlay">Nội dung nhạy cảm/ẩn</div>':''}
+      <img class="phimimg" src="${m.poster||'https://img.icons8.com/color/480/movie-projector.png'}" alt="Phim: ${m.title}">
       <div class="phimtitle">${m.title}</div>
       <div class="phimmeta">${m.genre||'?'}, ${m.year||''}</div>
       <div class="phimdesc">${m.desc||''}</div>
@@ -175,8 +158,6 @@ function showPhim(_id, ep=1) {
     epObj.drive?`<div><b>Link Google Drive:</b> <a href="${epObj.drive}" target="_blank" style="color:#ffe066;">Mở link gốc</a></div>`:'',
     m.rating?`<div><b>Điểm TB:</b> ${m.rating}</div>`:''
   ].join('');
-  // Nếu nhạy cảm thì warning luôn modal
-  if(m.isBlur){ showToast("CẢNH BÁO: Nội dung/hình ảnh nhạy cảm!"); }
   document.getElementById('driveFrame').src = epObj.drive||"";
   document.getElementById('playerModal').style.display = 'flex';
   document.querySelector('.modalDriveCustom').classList.add('show-drive');
