@@ -6,15 +6,16 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
-    body{font-family:'Be Vietnam Pro',sans-serif;background:#181843;margin:0;display:flex;align-items:center;justify-content:center;height:100vh;}
-    .login-card{background:#242155;border-radius:18px;box-shadow:0 8px 42px #0006;padding:33px 39px;max-width:390px;width:97vw;}
-    h2{color:#e50914;font-weight:900;margin-top:0;}
-    label{display:block;margin-bottom:6px;font-weight:700;color:#ffe066;}
-    input[type=text],input[type=password]{width:92%;font-size:1.1em;padding:10px 16px;border-radius:8px;border:none;margin-bottom:17px;background:#232949;color:#fff;}
-    button{background:#e50914;color:#fff;font-family:'Be Vietnam Pro',sans-serif;padding:11px 31px;font-weight:900;font-size:1.1em;border:none;border-radius:11px;margin-top:4px;}
-    .msg-err{color:#fd3033;font-weight:700;margin-bottom:7px;}
-    .footer-link{margin-top:15px;}
-    a{color:#ffe066;text-decoration:underline;}
+    body{font-family:'Be Vietnam Pro',sans-serif;background:radial-gradient(circle,#212245 69%,#0f111b 110%);margin:0;display:flex;align-items:center;justify-content:center;height:100vh;}
+    .login-card{background:#312b55c7;border-radius:18px;box-shadow:0 8px 42px #001c6a4f;padding:38px 42px;max-width:390px;width:97vw;}
+    h2{color:#e50914;font-weight:900;margin-top:0;text-align:center;letter-spacing:.5px;}
+    label{font-weight:700;color:#ffe066;margin-bottom:4px;margin-top:10px;display:block;}
+    input{width:97%;font-size:1.13em;padding:11px 15px;border-radius:7px;border:none;margin-bottom:17px;background:#1c1e31;color:#fff;}
+    button{background:#e50914;color:#fff;font-family:'Be Vietnam Pro',sans-serif;padding:12px 28px;font-weight:900;font-size:1.1em;border:none;border-radius:11px;width:100%;margin-top:7px;}
+    .msg-err{color:#fd3033;font-weight:700;margin-bottom:7px;min-height:18px;}
+    .msg-ok{color:#55ff98;}
+    .footer-link{margin-top:15px;text-align:center;font-size:1.09em;}
+    a{color:#ffe066;}
   </style>
 </head>
 <body>
@@ -22,46 +23,48 @@
   <h2>Đăng nhập MovieHub</h2>
   <form id="loginForm" autocomplete="on">
     <label for="username">Tên đăng nhập</label>
-    <input type="text" id="username" name="username" required/>
+    <input type="text" id="username" name="username" autocomplete="username" required/>
     <label for="password">Mật khẩu</label>
-    <input type="password" id="password" name="password" required/>
+    <input type="password" id="password" name="password" autocomplete="current-password" required/>
     <div class="msg-err" id="errMsg"></div>
-    <button type="submit">Đăng nhập</button>
+    <button type="submit" id="loginBtn">Đăng nhập</button>
   </form>
   <div class="footer-link">
     Chưa có tài khoản? <a href="dang-ky.html">Đăng ký</a>
   </div>
 </div>
 <script>
-const SHEET_ID = '15mFrve7Z-_zi_7AvSq3t9Nti1VjINVHCQDF7LRmP1QQ';
+const SHEET_ID = '1G05UujE_YLzRBsIsBNmjthS3MrAzza5rdc6RQyNbmX';
 const API_KEY = 'AIzaSyD5dWLgYZPu1_-AkwAaHPClGOOQ-Lq5EGI';
-const USERS_RANGE = 'Users!A2:C'; // A: username, B: password, C: role
+const USERS_RANGE = 'Users!A2:C';
 
 async function checkUser(username, password){
   let url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${USERS_RANGE}?key=${API_KEY}`;
   let res = await fetch(url); let data = await res.json();
-  let users = (data.values||[]).map(r=>({user:r[0],pass:r[1],role:r[2]}));
+  let users = (data.values||[]).map(r=>({user:r[0],pass:r[1]}));
   let ok = users.find(u=>u.user===username&&u.pass===password);
   return ok ? ok.user : null;
 }
+
 document.getElementById('loginForm').onsubmit = async function(e){
   e.preventDefault();
   let u=document.getElementById('username').value.trim(), p=document.getElementById('password').value.trim();
-  document.getElementById('errMsg').textContent='Đang kiểm tra...';
+  let btn=document.getElementById('loginBtn');
+  btn.disabled=true;btn.innerText="Đang đăng nhập...";
+  let msg = document.getElementById('errMsg');
+  msg.textContent='';
   let usr = await checkUser(u,p);
   if(usr){
     localStorage.setItem('moviehub_user',usr);
-    document.getElementById('errMsg').style.color="#55ff98";
-    document.getElementById('errMsg').textContent="Đăng nhập thành công! Đang chuyển tiếp trang...";
+    msg.className="msg-ok";msg.textContent="Đăng nhập thành công! Đang chuyển trang...";
     setTimeout(()=>{
-      // Chuyển hướng trở lại index hoặc vị trí tập trước
       const urlParams = new URLSearchParams(window.location.search);
       let ret = urlParams.get("return");
       window.location.href = "index.html"+(ret?ret:"");
     },1000);
   }else{
-    document.getElementById('errMsg').style.color="#fd3033";
-    document.getElementById('errMsg').textContent = "Sai tài khoản hoặc mật khẩu!";
+    msg.className="msg-err"; msg.textContent = "Sai tài khoản hoặc mật khẩu!";
+    btn.disabled=false;btn.innerText="Đăng nhập";
   }
 }
 </script>
