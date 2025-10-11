@@ -150,17 +150,19 @@ function showPhim(_id, ep=1) {
     `<div><b>Năm:</b> ${m.year||''}</div>`,
     `<div><b>Thể loại:</b> ${m.genre||''}</div>`,
     m.cast ? `<div><b>Diễn viên:</b> ${m.cast}</div>` : '',
-    m.comments ? `<div><b>Bình luận:</b> ${m.comments}</div>`:"",
-    m.trailer ? `<div><b>Trailer:</b> <a href="${m.trailer}" target="_blank" style="color:#ffe066">Xem trailer</a></div>`:"",
     isSeries ? `<div id="episodePicker">${
       m.episodes.map(e=>`<button onclick="showPhim('${m.id}',${e.ep})" class="btn${e.ep==ep?' watchbtn-ep-active':''}">Tập ${e.ep}</button>`).join('')
     }</div>` : '',
-    epObj.drive?`<div><b>Link Google Drive:</b> <a href="${epObj.drive}" target="_blank" style="color:#ffe066;">Mở link gốc</a></div>`:'',
-    m.rating?`<div><b>Điểm TB:</b> ${m.rating}</div>`:''
+    epObj.drive?`<div><b>Link Google Drive:</b> <a href="${epObj.drive}" target="_blank" style="color:#ffe066;">Mở link gốc</a></div>`:''
   ].join('');
-  document.getElementById('driveFrame').src = epObj.drive||"";
+  let ifr = document.getElementById('driveFrame');
+  if (epObj.drive && epObj.drive.includes("https://drive.google.com/")) {
+    ifr.src = epObj.drive;
+  } else {
+    ifr.src = "";
+    showToast("Không tìm thấy link Google Drive hợp lệ cho tập phim này!");
+  }
   document.getElementById('playerModal').style.display = 'flex';
-  document.querySelector('.modalDriveCustom').classList.add('show-drive');
 }
 function closePlayer(){
   document.getElementById('driveFrame').src='';
@@ -182,4 +184,5 @@ window.addEventListener("hashchange", () => {
 </script>
 </body>
 </html>
+
 
