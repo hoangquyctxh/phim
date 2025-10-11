@@ -136,11 +136,19 @@ async function fetchPhimFromSheet(){
   renderPhim();
 }
 
+<!-- Xem lại phần trên, chỉ gửi phần fix quan trọng nhất -->
+
+<script>
+// ... biến cài sẵn
 function renderPhim(){
   let html = '';
   phimList.forEach(m => {
     let isSeries = m.episodes.length>1;
-    let poster = m.poster||m.episodes[0].poster||'https://img.icons8.com/color/480/movie-projector.png';
+    let poster = (m.poster && m.poster.includes("http")) ? m.poster
+      : (m.episodes[0] && m.episodes[0].poster && m.episodes[0].poster.includes("http")) 
+      ? m.episodes[0].poster : null;
+    let valid = (m.title||m.id) && poster && m.episodes.some(ep=>ep.drive && ep.drive.startsWith('https://drive.google.com'));
+    if(!valid) return; // Bỏ phim/tập lỗi
     let anyLocked = m.episodes.some(ep=>String(ep.special).toLowerCase()==="yes"||String(ep.special)==="1"||String(ep.special)=="true");
     html += `<div class="phimcard" onclick="showPhim('${m.id}',1)">
       <span class="badge-new" style="${m.year >= (new Date().getFullYear()-1)?'':'display:none'}">MỚI</span>
@@ -154,6 +162,7 @@ function renderPhim(){
   });
   document.getElementById('genreRows').innerHTML = html;
 }
+</script>
 
 function copyPlayerLink(){
   navigator.clipboard.writeText(window.location.origin+window.location.pathname+window.location.hash);
@@ -215,4 +224,5 @@ window.addEventListener("hashchange", () => {
 </script>
 </body>
 </html>
+
 
