@@ -2,350 +2,202 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
-  <title>MovieHub – Phim hay chất lượng</title>
+  <title>MovieHub – Giao diện pro, nhiều tập, che nhạy cảm tự động</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=yes"/>
-  <meta name="theme-color" content="#191a24"/>
-  <meta name="description" content="MovieHub - Web phim chất lượng. Cập nhật liên tục.">
+  <meta name="theme-color" content="#151324"/>
   <link rel="icon" type="image/svg+xml" href="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png">
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;800&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg-main:#1a1930;
-      --accent:#e50914;
-      --accent2:#ffe066;
-      --modal-bg:#262243ee;
-      --card-bg:#232748f5;
-      --card-bg2:#18223aef;
-      --avatar:#f3f6ec;
-      --blur:#23203fa8;
-      --shadow:0 8px 36px #321a4e48;
-      --card-radius:27px;
-      --masonry-gap:22px;
-      --danger:#ff4052;
-    }
-    html,body{background:var(--bg-main);}
-    body{font-family: 'Manrope', Arial, Verdana, sans-serif; color:#fff; margin:0; font-size:18px;}
-    .container{max-width:1120px;margin:0 auto;padding:33px 5vw 88px 5vw;}
-    header{display:flex;align-items:center;gap:16px;padding:18px 3vw 13px 2vw;background:linear-gradient(89deg,#191742 79%,#321335 111%);}
-    .logo{height:44px;width:44px;margin-right:8px;box-shadow:0 2px 16px #e5091466;border-radius:100%;background:#ffe06616;}
-    .title{font-size:clamp(1.35em,3vw,2.19em);font-weight:900;color:var(--accent);letter-spacing:0.04em;}
-    .searchbox{flex:1 1 220px;max-width:330px;margin:0 18px 0 0;padding:12px 18px;border-radius:10px;border:none;background:#242858;font-size:1.05em;color:#eaedfd;outline:2px solid transparent;transition:.18s;}
-    .searchbox:focus{outline:2px solid var(--accent2);background:#281728;}
-    #genreFilter{padding:11px 19px;border-radius:8px;background:#241c38cc;color:#ffc;border:none;font-size:1em;}
-    .btn{padding:11px 25px;font-weight:900;font-size:1.04em;border:none;border-radius:13px;background:var(--accent);color:#fff;box-shadow:0 6px 28px #d5091522;transition:.15s;cursor:pointer;}
-    .btn:hover{background:#e52b41;}
-    .btn:active{transform:scale(.975);}
-    #themeToggle{margin-left:14px;transition:.3s;}
-    .right{margin-left:auto;display:flex;gap:17px;}
-    .avatar{background:var(--avatar);border-radius:50%;width:43px;height:43px;display:inline-block;box-shadow:0 2px 19px #afeea3c8;}
-    .avatar:hover{transform:rotate(14deg) scale(1.1);}
-    h2{margin:34px 0 26px 0;text-shadow:0 2px 12px #e5091436;font-size:clamp(1.15em,3vw,1.77em);}
-    .slider-preview{overflow-x:auto;display:flex;gap:21px;margin:8px 0 19px 0;}
-    .slider-preview img{height:97px;border-radius:14px;transition:box-shadow .16s;}
-    .slider-preview img:hover{box-shadow:0 6px 21px #ffe066c7;}
-    .masonry{column-count:3;column-gap:var(--masonry-gap);}
-    @media(max-width:900px){.masonry{column-count:2;}.container{padding-left:2vw;padding-right:2vw;}}
-    @media(max-width:550px){.masonry{column-count:1;}.container{padding-left:1vw;padding-right:1vw;}}
-    .phimcard{background:linear-gradient(132deg,var(--card-bg) 80%,var(--card-bg2) 111%);border-radius:var(--card-radius);box-shadow:var(--shadow);margin-bottom:24px;transition:.22s cubic-bezier(.25,.8,.6,1);position:relative;break-inside:avoid;transform:scale(.99);}
-    .phimcard.appear{animation:flyIn .62s cubic-bezier(.28,1.1,.38,1.06) forwards;}
-    .phimcard:hover{transform:scale(1.041) translateY(-13px);box-shadow:0 18px 48px #e509144c,0 4px 32px #32182c80;}
-    .phimimg{width:100%;aspect-ratio:2/3;object-fit:cover;border-top-left-radius:var(--card-radius);border-top-right-radius:var(--card-radius);}
-    .phimtitle{font-size:1.13em;margin:15px 22px 7px 17px;font-weight:900;}
-    .badge-new{display:inline-block;position:absolute;left:14px;top:16px;background:var(--accent);color:#fff;padding:3px 16px;border-radius:11px;font-weight:700;font-size:1em;box-shadow:0 2px 10px #fa555566;}
-    .badge-locked{background:var(--danger);color:#fff;border-radius:10px;font-size:.97em;padding:2px 14px;position:absolute;right:19px;top:19px;font-weight:600;box-shadow:0 1px 9px #3214;}
-    .phimdesc,.phimmeta,.phimcast{margin:2px 19px 3px 19px;font-size:.95em;}
-    .phimdesc{color:#f9eec8;}
-    .phimmeta{color:var(--accent2);}
-    .phimcast{color:#c1fade;}
-    .watchbtn{margin:13px 0 0 21px;padding:10px 27px;font-size:1em;box-shadow:0 1px 7px #19192260;}
-    .watchbtn.locked{background:#454560;color:#daaeae;}
-    /* ... tiếp hiệu ứng modal, player, toast, ripple, theme, footer ... */
-    /* Modal và hiệu ứng glass */
-    .modal{position:fixed;inset:0;background:rgba(23,20,40,0.8);backdrop-filter:blur(13px) brightness(.97);display:flex;align-items:center;justify-content:center;z-index:9000;}
-    .modalDriveCustom{background:linear-gradient(144deg,#23203c 88%,#232246 121%);border-radius:30px;box-shadow:0 12px 63px #15142575;padding:29px 22px 19px 23px;max-width:510px;width:99vw;max-height:98vh;position:relative;}
-    .modalDriveCustom input{width:95%;margin-bottom:14px;border-radius:11px;border:none;padding:13px;font-size:1.07em;background:#232a35;color:#fff;}
-    .errmsg{color:#ff4161;font-size:1em;font-weight:700;margin-left:2px;}
-    .closebtn2{position:absolute;right:13px;top:13px;background:var(--accent);color:var(--accent2);border:none;border-radius:13px;padding:9px 14px;font-size:1.19em;font-weight:900;cursor:pointer;z-index:2;box-shadow:0 2px 7px #ffe06699;}
-    .movie-player-plyr{display:none;margin-bottom:15px;}
-    .movie-player-iframe{display:none;margin-bottom:14px;}
-    .modalDriveCustom.show-plyr .movie-player-plyr{display:block;}
-    .modalDriveCustom.show-drive .movie-player-iframe{display:block;}
-    .plyr{border-radius:16px;box-shadow:0 8px 29px #0009;}
-    .watermark-logo{position:absolute;right:20px;bottom:22px;opacity:.13;z-index:5;user-select:none;height:59px;width:auto;max-width:22vw;}
-    .player-toolbar{display:flex;align-items:center;justify-content:space-between;margin-top:15px;}
-    .btnshare{background:#fff;color:var(--accent);font-weight:900;font-size:1em;padding:8px 13px;border-radius:9px;transition:.15s;}
-    .btnshare:hover{background:var(--accent2);color:#151;}
-    #playerFields{margin:21px 2px 0 5px;line-height:1.7;}
-    /* Toast, loader, ripple, hiệu ứng animation */
-    .toast{position:fixed;right:24px;bottom:19px;z-index:39000;background:linear-gradient(90deg,#191b20 80%,#ffe066 102%);color:#e50914;padding:17px 26px 14px 26px;border-radius:15px;font-size:1.12em;box-shadow:0 3px 27px #2222;display:none;font-weight:800;}
-    #globalLoading{display:flex;align-items:center;justify-content:center;position:fixed;inset:0;z-index:99999;background:#15122c;transition:.37s;opacity:1;}
-    #globalLoading.done{opacity:0;pointer-events:none;}
-    #globalLoading .spinner{width:41px;height:41px;border-radius:50%;border:7px solid #ffe066;border-top:7px solid #e50914;animation:spin1 .79s infinite linear;margin-right:10px;}
-    @keyframes spin1{to{transform:rotate(360deg)}}
-    @keyframes flyIn{0%{opacity:0;transform:translateY(29px) scale(.92);}100%{opacity:1;transform:translateY(0) scale(1);}}
-    .ripple{position:absolute;pointer-events:none;border-radius:50%;background:var(--accent2)22;transform:scale(.76);animation:rippleAnim .91s linear;}
-    @keyframes rippleAnim{to{opacity:0;transform:scale(2.6);}}
-    .footer-moviehub{background:#1a1a24;color:#ecdcbc;text-align:center;padding:17px 4vw 13px 4vw;margin-top:44px;font-size:1.07em;}
+    :root{--bg:#151324;--card:#22223D;--acc:#e50914;--acc2:#ffe066;--danger:#ff5864;}
+    body{background:var(--bg);margin:0;color:#fff;font-family:'Manrope',Arial,sans-serif;}
+    header{display:flex;align-items:center;gap:22px;height:70px;padding:0 3vw 0 0;background:linear-gradient(87deg,#181843 88%,#af1e36 121%);}
+    .logo{height:45px;width:45px;background:#fff;object-fit:cover;border-radius:16px;margin:0 17px;}
+    .title{font-size:2em;font-weight:900;color:var(--acc);flex:0;}
+    .searchbox{padding:10px 19px;font-size:1.07em;border-radius:9px;border:none;outline:none;background:rgba(41,44,82,.88);color:#fff;margin-right:18px;min-width:200px;}
+    #genreFilter{padding:10px 15px;border-radius:8px;background:#1f1c36dd;color:var(--acc2);font-size:1em;margin-right:17px;}
+    .btn{padding:8px 23px;font-weight:900;border:none;border-radius:11px;background:var(--acc);color:#fff;}
+    .container{max-width:1200px;margin:0 auto;padding:38px 4vw 88px 4vw;}
+    .moviegrid{display:flex;flex-wrap:wrap;gap:36px;justify-content:flex-start;}
+    @media (max-width:900px){.moviegrid{gap:16px;.container{padding:15px 1vw 30vw 1vw;}}}
+    .phimcard{flex:0 1 265px;max-width:265px;background:var(--card);border-radius:21px;box-shadow:0 6px 24px #13142b7a;overflow:hidden;display:flex;flex-direction:column;position:relative;transition:.16s;cursor:pointer;}
+    .phimcard:hover{transform:scale(1.045) translateY(-8px);box-shadow:0 17px 45px #e5091456,0 4px 22px #1e1e4680;}
+    .phimimg{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;}
+    .phimimg.blur{filter:blur(12px) brightness(1.1) grayscale(0.15);}
+    .badge-new{position:absolute;left:13px;top:13px;background:var(--acc);color:#fff;padding:2.5px 15px;border-radius:13px;font-weight:700;font-size:1.07em;box-shadow:0 1px 4px #fa555533;}
+    .badge-locked{background:var(--acc2);color:var(--acc);position:absolute;right:13px;top:15px;padding:2px 12.5px;border-radius:11px;font-weight:900;font-size:1.02em;}
+    .badge-nc{position:absolute;left:18px;bottom:15px;background:var(--danger);color:#fff;font-weight:900;padding:2.5px 13px;border-radius:11px;}
+    .phimtitle{margin:15px 15px 3px 17px;font-size:1.17em;font-weight:800;}
+    .phimmeta{font-size:.98em;color:var(--acc2);margin:0 18px 7px;}
+    .phimdesc{color:#fde9c8;margin:0 16px 8px;}
+    .phimcast{color:#b6fddf;font-size:.98em;margin:0 0 7px 16px;}
+    .watchbtn{margin:10px 0 17px 20px;padding:8px 21px;}
+    .btn.watchbtn-ep-active{background: #ffe066 !important;color: #e50914 !important;font-weight: 900;
+      border: 2px solid #ffe06644;transform: scale(1.13);}
+    /* Blur overlay for nhạy cảm */
+    .blur-overlay{position:absolute;inset:0;background:rgba(30,16,41,.59);border-radius:18px;z-index:9;display:flex;align-items:center;justify-content:center;font-size:1.3em;font-weight:900;color:#fff;backdrop-filter:blur(7px);}
+    /* Modal */
+    .modal{position:fixed;inset:0;background:rgba(16,13,29,.84);backdrop-filter:blur(9px);
+      display:flex;align-items:center;justify-content:center;z-index:9000;}
+    .modalDriveCustom{background:linear-gradient(144deg,#25223a 81%,#181834 131%);border-radius:28px;box-shadow:0 10px 53px #15142569;padding:29px 22px 19px 23px;max-width:540px;width:99vw;position:relative;}
+    .closebtn2{position:absolute;right:13px;top:13px;background:var(--acc);color:#fff;border:none;border-radius:14px;padding:9px 16px;font-size:1.25em;}
+    .movie-player-iframe{margin-bottom:14px;width:100%;}
+    #playerFields{margin:19px 1px 0 7px;}
+    /* Episode picker nút hàng ngang */
+    #episodePicker{margin:10px 0;display:flex;gap:10px;flex-wrap:wrap;}
+    /* Toast, footer ... giữ nguyên */
+    .toast{position:fixed;right:24px;bottom:17px;z-index:39000;background:linear-gradient(90deg,#191b20 80%,#ffe066 102%);color:#e50914;padding:11px 21px 11px 13px;border-radius:9px;font-size:1.09em;box-shadow:0 2px 12px #3223;display:none;font-weight:800;}
+    .footer-moviehub{background:#1a1a24;color:#ecdcbc;text-align:center;padding:14px 4vw 13px 4vw;margin-top:44px;font-size:1.07em;}
     .footer-logo{height:29px;opacity:.97;}
   </style>
 </head>
 <body>
-<div id="globalLoading"><div class="spinner"></div>Đang tải dữ liệu phim...</div>
 <header>
   <img class="logo" src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png" alt="MovieHub Logo"/>
   <span class="title">MovieHub</span>
   <input class="searchbox" id="quickSearch" placeholder="Tìm phim/Tìm diễn viên..."/>
   <select id="genreFilter"><option value="">Tất cả thể loại</option></select>
   <button id="themeToggle" class="btn" onclick="toggleTheme()" aria-label="Đổi theme">🌙</button>
-  <div class="right">
-    <span id="userPanel"></span>
-    <button id="loginBtn" class="btn" onclick="showLogin()" style="margin-left:8px;">Đăng nhập</button>
-    <button id="logoutBtn" class="btn" onclick="logoutUser()" style="display:none;margin-left:8px;">Đăng xuất</button>
-  </div>
 </header>
-<div class="container" role="main">
-  <h2>MovieHub – Giao diện hiện đại, tốc độ cao, animation nổi bật, xem phim cực mượt</h2>
-  <div class="slider-preview" id="sliderPreview"></div>
-  <div id="genreRows" class="masonry"></div>
+<div class="container">
+  <h2 style="font-size:1.35em;font-weight:900;padding:0 0 18px 0;">Danh sách phim mới · hỗ trợ chọn tập, che nhạy cảm tự động</h2>
+  <div id="genreRows" class="moviegrid"></div>
 </div>
 <div id="toastMsg" class="toast" aria-live="assertive"></div>
-<div id="loginModal" class="modal" aria-modal="true"><div class="modalDriveCustom" style="max-width:420px;">
-  <button class="closebtn2" onclick="closeLogin()" aria-label="Đóng">&times;</button>
-  <div style="color:#ffe066;margin:15px 3px 20px 3px;font-size:1.14em;font-weight:800;">Đăng nhập thành viên MovieHub</div>
-  <input id="loginUser" placeholder="Tài khoản..." autocomplete="username"/>
-  <input id="loginPass" type="password" placeholder="Mật khẩu..." autocomplete="current-password"/>
-  <button class="btn" onclick="doLogin()" style="width:100%">Đăng nhập</button>
-  <div class="errmsg" id="loginErr" style="display:none;margin-top:12px;"></div>
-</div></div>
-<div id="playerModal" class="modal" style="display:none;" aria-modal="true"><div class="modalDriveCustom">
-  <button class="closebtn2" onclick="closePlayer()" aria-label="Đóng player phim">&times;</button>
-  <div class="movie-player-plyr" style="display:none"><video id="plyrVideo" controls poster="" style="width:100%;" crossorigin="anonymous"></video></div>
-  <div class="movie-player-iframe" style="display:none"><iframe id="driveFrame" allowfullscreen allow="autoplay; fullscreen" style="width:100%;min-height:210px;border-radius:19px;background:#151823;border:none;"></iframe></div>
-  <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png" class="watermark-logo" alt="MovieHub Watermark"/>
-  <div class="player-toolbar"><span id="playerTitle" class="player-title"></span><button class="btnshare" onclick="copyPlayerLink()" style="margin-left:17px;">📋 Link phim</button></div>
-  <div id="playerFields"></div>
-</div></div>
+<!-- Tiếp đến phần player/modal/js -->
+<div id="playerModal" class="modal" style="display:none;" aria-modal="true">
+  <div class="modalDriveCustom">
+    <button class="closebtn2" onclick="closePlayer()" aria-label="Đóng player phim">&times;</button>
+    <div class="movie-player-iframe"><iframe id="driveFrame" allowfullscreen allow="autoplay; fullscreen" style="width:100%;min-height:230px;border-radius:17px;background:#181818;border:none;"></iframe></div>
+    <div class="player-toolbar"><span id="playerTitle" style="font-weight:900"></span>
+      <button class="btn" onclick="copyPlayerLink()" style="margin-left:13px;">📋 Sao chép link</button></div>
+    <div id="playerFields"></div>
+  </div>
+</div>
 <footer class="footer-moviehub">
   <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png" alt="MovieHub Logo" class="footer-logo"/>
-  <div class="footer-content">MovieHub &copy; 2025 – Giao diện phim proxy mượt, bản quyền thuộc MovieHub.vn</div>
+  <div class="footer-content">MovieHub &copy; 2025 – Giao diện premium, che nhạy cảm tự động</div>
 </footer>
-<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 <script>
 const SHEET_ID = '15mFrve7Z-_zi_7AvSq3t9Nti1VjINVHCQDF7LRmP1QQ';
 const API_KEY = 'AIzaSyD5dWLgYZPu1_-AkwAaHPClGOOQ-Lq5EGI';
 const SHEET_RANGE = 'Sheet1!A1:Z';
-const USERS_RANGE = 'Users!A2:C';
-let phimList=[], genresSet=new Set(), loggedUser = false, userList=[], sessionUser=null;
+let phimList = [], genresSet = new Set();
+function showToast(msg, dur = 2100){
+  let t = document.getElementById('toastMsg');
+  t.textContent = msg; t.style.display = "block";
+  setTimeout(() => t.style.display = "none", dur);
+}
+function toggleTheme(){document.body.classList.toggle("lightmode");}
 
-// Hiệu ứng toast tự động
-function showToast(msg,dur=2100){
-  let t=document.getElementById('toastMsg');
-  t.textContent=msg;
-  t.style.display="block";
-  t.style.transform="translateY(30px)";
-  setTimeout(()=>t.style.transform="translateY(0)",30);
-  setTimeout(()=>t.style.display="none",dur);
+// THUẬT TOÁN PHÁT HIỆN NHẠY CẢM: tag đặc biệt/cột đặc biệt hoặc tên chứa "jav,18+,sex,nsfw,..."
+function isBlurPhim(m){
+  let tn = (m.title||"")+","+(m.desc||"")+","+(m.genre||"");
+  if((m.special && String(m.special).toLowerCase()!=='false') || /(jav|porn|18\+|sex|nsfw|nhạy cảm|hschool|yaoi|hentai|xxx)/i.test(tn)) return true;
+  return false;
 }
-// Theme transition
-function toggleTheme(){
-  const body=document.body;
-  body.style.transition="background .2s";
-  if(body.classList.contains("lightmode")){
-    body.classList.remove("lightmode");
-    document.getElementById('themeToggle').innerText='🌙';
-    localStorage.setItem("moviehub_theme",'dark');
-  }else{
-    body.classList.add("lightmode");
-    document.getElementById('themeToggle').innerText='☀️';
-    localStorage.setItem("moviehub_theme",'light');
-  }
-}
-function playRipple(el,e){
-  const r=document.createElement('span');
-  r.className='ripple';
-  const rect=el.getBoundingClientRect(),
-    size=Math.max(rect.width,rect.height)*.66,
-    x=e.clientX-rect.left-size/2,
-    y=e.clientY-rect.top-size/2;
-  r.style.cssText=`width:${size}px;height:${size}px;top:${y}px;left:${x}px;`;
-  el.appendChild(r);
-  setTimeout(()=>el.removeChild(r),740);
-}
-function showLogin(){
-  document.getElementById('loginModal').style.display='flex';
-  document.getElementById('loginUser').value='';
-  document.getElementById('loginPass').value='';
-  document.getElementById('loginErr').style.display='none';
-}
-function closeLogin(){document.getElementById('loginModal').style.display='none';}
-function doLogin(){
-  let user=document.getElementById('loginUser').value.trim(),
-      pass=document.getElementById('loginPass').value.trim();
-  let found=userList.find(u=>u.user===user&&u.pass===pass);
-  if(found){
-    loggedUser=true;sessionUser=user;
-    closeLogin();renderPhim();showToast('Đăng nhập thành công!');
-    document.getElementById('loginBtn').style.display="none";
-    document.getElementById('logoutBtn').style.display="inline-block";
-    document.getElementById('userPanel').innerHTML = `<span class="avatar" title="Tài khoản: ${user}">${user[0].toUpperCase()}</span>`;
-  }else{
-    document.getElementById('loginErr').innerText='Sai tài khoản hoặc mật khẩu!';
-    document.getElementById('loginErr').style.display='block';
-  }
-}
-function logoutUser(){
-  loggedUser=false;sessionUser=null;
-  document.getElementById('userPanel').innerHTML='';
-  document.getElementById('loginBtn').style.display="inline-block";
-  document.getElementById('logoutBtn').style.display="none";
-  showToast("Đã đăng xuất!");renderPhim();
-}
-async function fetchUsers(){
-  const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${USERS_RANGE}?key=${API_KEY}`;
-  let res=await fetch(url);let data=await res.json();
-  userList=(data.values||[]).map(r=>({user:r[0],pass:r[1],role:r[2]}));
-}
-function extractFileId(link){
-  let m=link.match(/file\/d\/([a-zA-Z0-9_-]+)/)
-     ||link.match(/[?&]id=([a-zA-Z0-9_-]+)/)
-     ||link.match(/^([a-zA-Z0-9_-]{25,})$/);
-  return m?m[1]:null;
-}
-async function getGdPlayerProxyMp4(fileId){
-  try{
-    const api=`https://gdplayer.vip/api/video?file_id=${fileId}`;
-    const res=await fetch(api);if(!res.ok)return null;
-    const dt=await res.json();return dt.file;
-  }catch(e){return null;}
-}
-async function showPhim(_id){
-  let m=phimList.find(m=>encodeURIComponent(m.id)===_id);
-  if(!m) return showToast("Không tìm thấy phim!");
-  window.location.hash = "id=" + encodeURIComponent(m.id); // Cập nhật URL động
 
-  document.getElementById('playerTitle').innerText=m.title;
-  document.getElementById('playerFields').innerHTML=[
+async function fetchPhimFromSheet() {
+  let url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_RANGE}?key=${API_KEY}`;
+  let res = await fetch(url); let data = await res.json();
+  let rows = data.values || [], header = rows[0];
+  let idx = name => {
+    let i = header.findIndex(c => c && c.toLowerCase().replace(/\s+/g, '') === name.toLowerCase().replace(/\s+/g, ''));
+    return i >= 0 ? i : undefined;
+  };
+  phimList = rows.slice(1).map(row => {
+    let item = {};
+    header.forEach((h,i)=>{
+      let col = (row[i]||"").trim();
+      if(h.toLowerCase().includes('special')) col = (col||'').toLowerCase()==="yes"||col==="1"||col==="true";
+      if(h.toLowerCase().includes('episodes') && col.startsWith("[{"))
+        try{col=JSON.parse(col);}catch(e){}
+      item[h.trim().toLowerCase()] = col;
+    });
+    // Normalize
+    item.id = item['id']||item['tên phim']||item['title'];
+    item.title = item['title']||item['tên phim']||"";
+    item.desc = item['desc']||item['mô tả']||"";
+    item.genre = item['genre']||item['thể loại']||"";
+    item.year = item['year']||item['năm']||"";
+    item.poster = item['poster']||item['link poster']||"";
+    item.cast = item['diễn viên/đạo diễn']||item['cast']||"";
+    item.episodes = item['episodes'];
+    item.special = item['special'];
+    item.trailer = item['trailer']||"";
+    item.comments = item['comments']||"";
+    item.rating = item['điểm trung bình']||"";
+    item.isBlur = isBlurPhim(item);
+    return item;
+  }).filter(m => m.title||m.id);
+  genresSet = new Set(phimList.map(m=>m.genre).filter(Boolean));
+  renderPhim();
+}
+function renderPhim(){
+  let html = '';
+  phimList.forEach(m => {
+    let isSeries = Array.isArray(m.episodes) && m.episodes.length>0;
+    html += `<div class="phimcard" onclick="showPhim('${m.id}',1)">
+      ${m.rating?`<div style="position:absolute;top:13px;left:48px;background:rgba(0,0,0,0.5);color:#ffe066;padding:2px 9px 2px 6px;border-radius:12px 0 10px 8px;">★ ${m.rating}</div>`:""}
+      <span class="badge-new" style="${m.year >= (new Date().getFullYear()-1)?'':'display:none'}">MỚI</span>
+      ${m.special?'<span class="badge-locked">Khoá</span>':''}
+      <img class="phimimg${m.isBlur?' blur':''}" src="${m.poster||'https://img.icons8.com/color/480/movie-projector.png'}" alt="Phim: ${m.title}">
+      ${m.isBlur?'<div class="blur-overlay">Nội dung nhạy cảm/ẩn</div>':''}
+      <div class="phimtitle">${m.title}</div>
+      <div class="phimmeta">${m.genre||'?'}, ${m.year||''}</div>
+      <div class="phimdesc">${m.desc||''}</div>
+      ${m.cast?`<div class="phimcast">Diễn viên/Đạo diễn: ${m.cast}</div>`:''}
+      <button class="btn watchbtn" tabindex="-1" onclick="event.stopPropagation();showPhim('${m.id}',1)">${isSeries?"Chọn tập":"Xem phim"}</button></div>`;
+  });
+  document.getElementById('genreRows').innerHTML = html;
+}
+function extractFileId(link){ let m=link.match(/file\/d\/([a-zA-Z0-9_-]+)/)||link.match(/[?&]id=([a-zA-Z0-9_-]+)/)||link.match(/^([a-zA-Z0-9_-]{25,})$/); return m?m[1]:null;}
+function copyPlayerLink(){navigator.clipboard.writeText(window.location.origin+window.location.pathname+window.location.hash);showToast("Đã sao chép link phim/tập này!");}
+function showPhim(_id, ep=1) {
+  let m = phimList.find(x => x.id === _id || encodeURIComponent(x.id) === _id);
+  if (!m) return showToast("Không tìm thấy phim!");
+  if (typeof m.episodes === 'string' && m.episodes.startsWith('['))
+    try { m.episodes = JSON.parse(m.episodes); } catch(e){ m.episodes = []; }
+  let isSeries = Array.isArray(m.episodes) && m.episodes.length>0;
+  let epObj = isSeries ? m.episodes.find(e => e.ep == ep) : m;
+  window.location.hash = isSeries ? `id=${encodeURIComponent(m.id)}&ep=${ep}` : `id=${encodeURIComponent(m.id)}`;
+  document.getElementById('playerTitle').innerText = isSeries ? `${m.title} – Tập ${ep}` : m.title;
+  document.getElementById('playerFields').innerHTML = [
     `<div><b>Mô tả:</b> ${m.desc||''}</div>`,
     `<div><b>Năm:</b> ${m.year||''}</div>`,
     `<div><b>Thể loại:</b> ${m.genre||''}</div>`,
-    m.cast?`<div><b>Diễn viên/Đạo diễn:</b> ${m.cast}</div>`:'',
+    m.cast ? `<div><b>Diễn viên:</b> ${m.cast}</div>` : '',
+    m.comments ? `<div><b>Bình luận:</b> ${m.comments}</div>`:"",
+    m.trailer ? `<div><b>Trailer:</b> <a href="${m.trailer}" target="_blank" style="color:#ffe066">Xem trailer</a></div>`:"",
+    isSeries ? `<div id="episodePicker">${
+      m.episodes.map(e=>`<button onclick="showPhim('${m.id}',${e.ep})" class="btn${e.ep==ep?' watchbtn-ep-active':''}">Tập ${e.ep}</button>`).join('')
+    }</div>` : '',
+    epObj.drive?`<div><b>Link Google Drive:</b> <a href="${epObj.drive}" target="_blank" style="color:#ffe066;">Mở link gốc</a></div>`:'',
+    m.rating?`<div><b>Điểm TB:</b> ${m.rating}</div>`:''
   ].join('');
-  let fileId=extractFileId(m.drive),
-  modal=document.querySelector('.modalDriveCustom'),
-  plyrWrap=document.querySelector('.movie-player-plyr'),
-  ifrWrap=document.querySelector('.movie-player-iframe'),
-  plyr=document.getElementById('plyrVideo'),
-  ifr=document.getElementById('driveFrame');
-  plyrWrap.style.display=ifrWrap.style.display="none";
-  if(m.special&&!loggedUser){
-    showToast("Phim này yêu cầu đăng nhập.");closePlayer();showLogin();return;
-  }
-  document.getElementById('playerModal').style.display='flex';
-
-  if(fileId){
-    getGdPlayerProxyMp4(fileId).then(res=>{
-      if(res){
-        if(window.playerPlyr) try{window.playerPlyr.destroy();}catch(e){}
-        ifrWrap.style.display="none";plyrWrap.style.display="block";plyr.poster=m.poster||'';plyr.src=res;
-        window.playerPlyr=new Plyr('#plyrVideo',{controls:['play-large','play','progress','current-time','duration','mute','volume','settings','fullscreen'], settings:['quality','speed','loop'],ratio:'16:9',fullscreen:{ enabled:true, fallback:true, iosNative:true } });
-        playerPlyr.source={type:"video",sources:[{src:res,type:'video/mp4',size:720}]};
-        modal.classList.remove('show-drive');modal.classList.add('show-plyr');
-      }else{
-        plyrWrap.style.display="none";ifrWrap.style.display="block";
-        ifr.src=`https://drive.google.com/file/d/${fileId}/preview`;
-        modal.classList.remove('show-plyr');modal.classList.add('show-drive');
-      }
-    }).catch(()=>{
-      plyrWrap.style.display="none";ifrWrap.style.display="block";
-      ifr.src=`https://drive.google.com/file/d/${fileId}/preview`;
-      modal.classList.remove('show-plyr');modal.classList.add('show-drive');
-    });
-  }else{
-    plyrWrap.style.display="none";ifrWrap.style.display="block";
-    ifr.src=m.drive;
-    modal.classList.remove('show-plyr');modal.classList.add('show-drive');
-  }
+  // Nếu nhạy cảm thì warning luôn modal
+  if(m.isBlur){ showToast("CẢNH BÁO: Nội dung/hình ảnh nhạy cảm!"); }
+  document.getElementById('driveFrame').src = epObj.drive||"";
+  document.getElementById('playerModal').style.display = 'flex';
+  document.querySelector('.modalDriveCustom').classList.add('show-drive');
 }
 function closePlayer(){
   document.getElementById('driveFrame').src='';
-  if(window.playerPlyr)window.playerPlyr.pause();
   document.getElementById('playerModal').style.display='none';
-  document.querySelector('.modalDriveCustom').classList.remove('show-drive','show-plyr');
+  document.querySelector('.modalDriveCustom').classList.remove('show-drive');
   history.replaceState(null,null,window.location.pathname);
 }
-function copyPlayerLink(){
-  let link=window.location.origin+window.location.pathname+window.location.hash;
-  navigator.clipboard.writeText(link);showToast("Đã sao chép link phim: "+link);
-}
-async function fetchPhim(){
-  let url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_RANGE}?key=${API_KEY}`;
-  let res=await fetch(url);let data=await res.json();let rows=data.values||[],
-  header=rows[0],idx=n=>header.findIndex(x=>x&&x.trim().toLowerCase()===n);
-  phimList=rows.slice(1).map(row=>({
-    title:row[idx('tên phim')]||'',desc:row[idx('mô tả')]||'',genre:row[idx('thể loại')]||'',
-    year:row[idx('năm')]||'',id:row[idx('id')]||'',drive:row[idx('link google drive')]||'',
-    poster:row[idx('link poster')]||'',special:(row[idx('special')]||'').trim().toLowerCase()==='yes',
-    cast:row[idx('diễn viên/đạo diễn')]||'',isNew:row[idx('năm')]&&+row[idx('năm')]>=((new Date()).getFullYear()-1)
-  })).filter(m=>m.title);genresSet=new Set(phimList.map(m=>m.genre).filter(g=>g&&g!==''));updateGenreOptions();renderPhim();renderSliderPreview();
-}
-function updateGenreOptions(){
-  let sel=document.getElementById("genreFilter");
-  sel.innerHTML=`<option value=\"\">Tất cả thể loại</option>${Array.from(genresSet).map(g=>`<option value=\"${g}\">${g}</option>`).join('')}`;
-}
-function renderPhim(){
-  const sel=document.getElementById("genreFilter"),
-  search=document.getElementById("quickSearch").value.trim().toLowerCase(),
-  selected=sel.value||'';let phimTheoGenre={};
-  phimList.filter(m=>
-    (!selected||m.genre===selected)
-    &&(!search||m.title.toLowerCase().includes(search)||m.genre.toLowerCase().includes(search)
-        ||m.desc.toLowerCase().includes(search)||(m.cast||'').toLowerCase().includes(search)))
-    .forEach(m=>(phimTheoGenre[m.genre]=phimTheoGenre[m.genre]||[]).push(m));
-  let html='';for(const genre of Object.keys(phimTheoGenre)){
-    html+=`<div class="row-title">${genre}</div><div class="phimlist">${
-    phimTheoGenre[genre].map(m=>`<div class="phimcard" onclick="showPhim('${encodeURIComponent(m.id)}')" onmousedown="playRipple(this,event)">
-      <span class="badge-new" style="${m.isNew?'':'display:none'}">MỚI</span>
-      ${m.special?'<span class="badge-locked">Khóa</span>':''}
-      <img class="phimimg" src="${m.poster||'https://img.icons8.com/color/480/movie-projector.png'}" alt="Phim: ${m.title}">
-      <div class="phimtitle">${m.title}</div>
-      <div class="phimmeta">Thể loại: ${m.genre||'Chưa rõ'} | Năm: ${m.year||''}</div>
-      <div class="phimdesc">${m.desc||''}</div>
-      ${m.cast?`<div class="phimcast">Diễn viên/Đạo diễn: ${m.cast}</div>`:''}
-      <button class="btn watchbtn${m.special?' locked':''}" tabindex="-1" onclick="event.stopPropagation();showPhim('${encodeURIComponent(m.id)}')">${m.special?'Chỉ thành viên':'Xem phim'}</button>
-    </div>`).join('')}</div>`;
-  }
-  document.getElementById('genreRows').innerHTML=html;
-  setTimeout(()=>{document.querySelectorAll('.phimcard').forEach((el,i)=>setTimeout(()=>el.classList.add('appear'),63*i));},16);
-}
-function renderSliderPreview(){
-  let arr=[...phimList], k=Math.min(arr.length,10), out=[];
-  while(k-- && arr.length){
-    let r=Math.floor(Math.random()*arr.length);out.push(arr[r]);arr.splice(r,1);
-  }
-  document.getElementById('sliderPreview').innerHTML=out.map(m=>
-    `<img src="${m.poster||'https://img.icons8.com/color/480/movie-projector.png'}" title="${m.title}" onclick="showPhim('${encodeURIComponent(m.id)}')">`
-  ).join('');
-}
-window.onload=async()=>{
-  document.getElementById('globalLoading').classList.remove('done');await fetchUsers();await fetchPhim();
-  let th=localStorage.getItem("moviehub_theme");
-  if(th==="light"){document.body.classList.add("lightmode");document.getElementById('themeToggle').innerText='☀️';}
-  else{document.getElementById('themeToggle').innerText='🌙';}
-  setTimeout(()=>{document.getElementById('globalLoading').classList.add('done');},99);
-  if(location.hash.startsWith("#id=")){let id=decodeURIComponent(location.hash.slice(4));showPhim(encodeURIComponent(id));}
-  document.getElementById('loginBtn').style.display="inline-block";
-  document.getElementById('logoutBtn').style.display="none";
-}
-window.addEventListener("hashchange",()=>{
-  if(location.hash.startsWith("#id=")){
-    let id=decodeURIComponent(location.hash.slice(4));showPhim(encodeURIComponent(id));
-  } else closePlayer();
+window.onload = () => {
+  fetchPhimFromSheet();
+  let params = new URLSearchParams(window.location.hash.replace('#',''));
+  let showid = params.get('id'), epNum = +params.get('ep')||1;
+  if(showid) showPhim(showid, epNum);
+};
+window.addEventListener("hashchange", () => {
+  let params = new URLSearchParams(window.location.hash.replace('#',''));
+  let showid = params.get('id'), epNum = +params.get('ep')||1;
+  if(showid) showPhim(showid, epNum); else closePlayer();
 });
-document.getElementById("genreFilter").addEventListener("change",renderPhim);
-document.getElementById("quickSearch").addEventListener("input",()=>{renderPhim();});
 </script>
 </body>
 </html>
-
-
