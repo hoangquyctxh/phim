@@ -2,18 +2,17 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8"/>
-  <title>MovieHub – Xem phim chất lượng</title>
+  <title>MovieHub – Xem phim, khoá tập, tiếng Việt hóa, không lỗi</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="theme-color" content="#151324"/>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css"/>
-  <meta name="theme-color" content="#151324"/>
   <link rel="icon" type="image/svg+xml" href="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a75fa0ae-d935-45d3-a56a-67182b3177fa.png">
   <style>
     body{font-family:'Be Vietnam Pro',sans-serif;background:#181843;margin:0;color:#fff;}
     header{display:flex;align-items:center;gap:22px;height:70px;padding:0 3vw 0 0;background:linear-gradient(87deg,#181843 88%,#af1e36 111%);}
     .logo{height:45px;width:45px;background:#fff;object-fit:cover;border-radius:16px;margin:0 17px;}
     .title{font-size:2em;font-weight:900;color:#e50914;letter-spacing:1px;}
-    .searchbox{padding:10px 19px;font-size:1.07em;border-radius:9px;border:none;outline:none;background:rgba(41,44,82,.88);color:#fff;margin-right:18px;min-width:200px;}
     .btn{padding:9px 21px;font-weight:900;font-family:'Be Vietnam Pro',sans-serif;border:none;border-radius:11px;background:#e50914;color:#fff;}
     .loginbar{margin-left:auto;display:flex;align-items:center;gap:16px;}
     .user-name{font-weight:900;font-size:1em;display:inline-block;margin-right:7px;}
@@ -102,54 +101,53 @@ function logout(){
   showToast("Bạn đã đăng xuất!");
 }
 
-// CHỈ thêm card phim thực sự hợp lệ (tên, có poster, có tập có link drive)
-async function fetchPhimFromSheet(){
+// CHỈ thêm card phim thật sự hợp lệ (ít nhất 1 tập drive), KHÔNG loại bỏ toàn bộ phim vì 1 tập sai
+function fetchPhimFromSheet(){
   let url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_RANGE}?key=${API_KEY}`;
-  let res = await fetch(url); let data = await res.json();
-  let rows = data.values || [], header = rows[0];
-  let list = rows.slice(1).map(row=>{
-    let obj={};header.forEach((h,i)=>{
-      let val = (row[i]||"").trim();
-      if(h.toLowerCase().includes('link google drive')) val = normalizeDriveLink(val);
-      obj[h.trim()] = val;
-    });return obj;
-  }).filter(m=>m["Tên phim"]||m["ID"]);
-  // Gom các dòng cùng ID thành 1 phim
-  let phimGom = {};
-  list.forEach(item=>{
-    let id = item["ID"]||item["Tên phim"];
-    if(!phimGom[id]) phimGom[id] = {
-      id:id, title: item["Tên phim"], desc:item["Mô tả"], genre:item["Thể loại"], year:item["Năm"],
-      poster:item["Link poster"], special:item["Special"], cast:item["Diễn viên/Đạo diễn"], comments:item["Comments"],
-      rating:item["Điểm trung bình"], trailer:item["Trailer"], episodes:[]
-    };
-    let epNum = Number(item["Tập"]||1);
-    phimGom[id].episodes.push({
-      ep:epNum, title:item["Mô tả"]||("Tập "+epNum), drive:item["Link Google Drive"], poster:item["Link poster"]||"", special:item["Special"]
+  fetch(url).then(r=>r.json()).then(data=>{
+    let rows = data.values || [], header = rows[0];
+    let list = rows.slice(1).map(row=>{
+      let obj={};header.forEach((h,i)=>{
+        let val = (row[i]||"").trim();
+        if(h.toLowerCase().includes('link google drive')) val = normalizeDriveLink(val);
+        obj[h.trim()] = val;
+      });return obj;
+    }).filter(m=>m["Tên phim"]||m["ID"]);
+    // Gom tập cùng 1 phim/bộ
+    let phimGom={};
+    list.forEach(item=>{
+      let id = item["ID"]||item["Tên phim"];
+      if(!phimGom[id]) phimGom[id]={
+        id, title:item["Tên phim"], desc:item["Mô tả"], genre:item["Thể loại"], year:item["Năm"],
+        poster:item["Link poster"], special:item["Special"], cast:item["Diễn viên/Đạo diễn"], comments:item["Comments"],
+        rating:item["Điểm trung bình"], trailer:item["Trailer"], episodes:[]
+      };
+      let epNum=Number(item["Tập"]||1);
+      let isLocked=(item["Special"]||"").toLowerCase()==="yes"||item["Special"]==="1"||item["Special"]==="true";
+      if(item["Link Google Drive"] && item["Link Google Drive"].startsWith("https://drive.google.com"))
+        phimGom[id].episodes.push({
+          ep:epNum,title:item["Mô tả"]||("Tập "+epNum),drive:item["Link Google Drive"],
+          poster:item["Link poster"]||"",special:item["Special"],isLocked
+        });
+      if(item["Thể loại"]) genresSet.add(item["Thể loại"]);
     });
-    genresSet.add(item["Thể loại"]);
+    // Chỉ lấy phim có tên hoặc id và có ít nhất 1 tập hợp lệ
+    phimList = Object.values(phimGom).filter(m=>(m.title||m.id)&&m.episodes.length);
+    renderPhim();
   });
-  // **Chỉ lấy phim đủ poster, tên, có tập hợp lệ**
-  phimList = Object.values(phimGom).filter(m=>{
-    let poster = (m.poster && m.poster.includes("http")) || (m.episodes[0] && m.episodes[0].poster && m.episodes[0].poster.includes("http"));
-    let validEp = m.episodes && m.episodes.some(ep=>ep.drive && ep.drive.startsWith("https://drive.google.com"));
-    return poster && (m.title||m.id) && validEp;
-  });
-  renderPhim();
 }
 
 function renderPhim(){
-  let html = '';
-  phimList.forEach(m => {
-    let isSeries = m.episodes.length>1;
-    let poster = (m.poster && m.poster.includes("http")) ? m.poster
+  let html='';
+  phimList.forEach(m=>{
+    let isSeries=m.episodes.length>1;
+    let poster=(m.poster && m.poster.includes("http")) ? m.poster
       : (m.episodes[0] && m.episodes[0].poster && m.episodes[0].poster.includes("http")) 
       ? m.episodes[0].poster : null;
-    let valid = (m.title||m.id) && poster && m.episodes.some(ep=>ep.drive && ep.drive.startsWith('https://drive.google.com'));
-    if(!valid) return;
-    let anyLocked = m.episodes.some(ep=>String(ep.special).toLowerCase()==="yes"||String(ep.special)==="1"||String(ep.special)=="true");
-    html += `<div class="phimcard" onclick="showPhim('${m.id}',1)">
-      <span class="badge-new" style="${m.year >= (new Date().getFullYear()-1)?'':'display:none'}">MỚI</span>
+    if(!(m.title||m.id) || !poster || !m.episodes.length) return;
+    let anyLocked=m.episodes.some(e=>e.isLocked);
+    html+=`<div class="phimcard" onclick="showPhim('${m.id}',1)">
+      <span class="badge-new" style="${m.year>=(new Date().getFullYear()-1)?'':'display:none'}">MỚI</span>
       ${anyLocked?'<span class="badge-locked">Khoá</span>':''}
       <img class="phimimg" src="${poster}" alt="Phim: ${m.title}">
       <div class="phimtitle">${m.title}</div>
@@ -158,7 +156,7 @@ function renderPhim(){
       ${m.cast?`<div class="phimcast">Diễn viên/Đạo diễn: ${m.cast}</div>`:''}
       <button class="btn watchbtn" tabindex="-1" onclick="event.stopPropagation();showPhim('${m.id}',1)">${isSeries?"Chọn tập":"Xem phim"}</button></div>`;
   });
-  document.getElementById('genreRows').innerHTML = html;
+  document.getElementById('genreRows').innerHTML=html;
 }
 
 function copyPlayerLink(){
@@ -166,47 +164,38 @@ function copyPlayerLink(){
   showToast("Đã sao chép link phim/tập này!");
 }
 
-function showPhim(_id, ep=1) {
-  let user = getUsername();
-  let m = phimList.find(x => String(x.id) === String(_id));
-  if (!m) return showToast("Không tìm thấy phim!");
-  let epList = m.episodes || [];
-  let epObj = epList.find(e=>String(e.ep)==String(ep)) || epList[0] || {};
-  let isLocked = String(epObj.special).toLowerCase()==="yes"||String(epObj.special)==="1"||String(epObj.special)=="true";
-  if(isLocked && !user){
-    showToast("Tập này khoá, bạn cần đăng nhập!");
-    setTimeout(()=>location.href='dang-nhap.html?return='+encodeURIComponent(window.location.hash),1200);
-    return;
+function showPhim(_id, ep=1){
+  let user=getUsername();
+  let m=phimList.find(x=>String(x.id)===String(_id));
+  if(!m) return showToast("Không tìm thấy phim!");
+  let epList=m.episodes||[];let epObj=epList.find(e=>String(e.ep)==String(ep))||epList[0]||{};
+  let isLocked=epObj.isLocked;
+  if(isLocked&&!user){
+    showToast("Tập này khoá, bạn cần đăng nhập!");setTimeout(()=>location.href='dang-nhap.html?return='+encodeURIComponent(window.location.hash),1100);return;
   }
-  window.location.hash = epList.length>1 ? `id=${encodeURIComponent(m.id)}&ep=${epObj.ep||1}` : `id=${encodeURIComponent(m.id)}`;
-  document.getElementById('playerTitle').innerText = epList.length>1 ? `${m.title} – Tập ${epObj.ep}` : m.title;
-  document.getElementById('playerFields').innerHTML = [
+  window.location.hash=epList.length>1?`id=${encodeURIComponent(m.id)}&ep=${epObj.ep||1}`:`id=${encodeURIComponent(m.id)}`;
+  document.getElementById('playerTitle').innerText = epList.length>1?`${m.title} – Tập ${epObj.ep}`:m.title;
+  document.getElementById('playerFields').innerHTML=[
     `<div><b>Mô tả:</b> ${m.desc||''}</div>`,
     `<div><b>Năm:</b> ${m.year||''}</div>`,
     `<div><b>Thể loại:</b> ${m.genre||''}</div>`,
-    m.cast ? `<div><b>Diễn viên:</b> ${m.cast}</div>` : '',
-    m.comments ? `<div><b>Bình luận:</b> ${m.comments}</div>`:"",
-    m.trailer ? `<div><b>Trailer:</b> <a href="${m.trailer}" target="_blank" style="color:#ffe066">Xem trailer</a></div>`:"",
-    epList.length>1 ? `<div id="episodePicker">${
-      epList.map(e=>`<button onclick="showPhim('${m.id}',${e.ep})" class="btn${e.ep==epObj.ep?' watchbtn-ep-active':''}${String(e.special).toLowerCase()==='yes'||String(e.special)=="1"||String(e.special)=="true"?' badge-locked':''}">${e.special?"🔒 ":""}Tập ${e.ep}</button>`).join('')
-    }</div>` : ''
+    m.cast?`<div><b>Diễn viên:</b> ${m.cast}</div>`:'',
+    m.comments?`<div><b>Bình luận:</b> ${m.comments}</div>`:"",
+    m.trailer?`<div><b>Trailer:</b> <a href="${m.trailer}" target="_blank" style="color:#ffe066">Xem trailer</a></div>`:"",
+    epList.length>1?`<div id="episodePicker">${
+      epList.map(e=>`<button onclick="showPhim('${m.id}',${e.ep})" class="btn${e.ep==epObj.ep?' watchbtn-ep-active':''}${e.isLocked?' badge-locked':''}">${e.isLocked?"🔒 ":""}Tập ${e.ep}</button>`).join('')
+    }</div>`:''
   ].join('');
-  let ifr = document.getElementById('driveFrame');
-  if (epObj.drive && epObj.drive.includes("https://drive.google.com/")) {
-    ifr.src = normalizeDriveLink(epObj.drive);
-  } else {
-    ifr.src = "";
-    showToast("Không tìm thấy link Google Drive hợp lệ cho tập phim này!");
-  }
-  document.getElementById('playerModal').style.display = 'flex';
+  let ifr=document.getElementById('driveFrame');
+  if(epObj.drive&&epObj.drive.includes("https://drive.google.com/"))ifr.src=normalizeDriveLink(epObj.drive);
+  else{ifr.src="";showToast("Không tìm thấy link Google Drive hợp lệ cho tập phim này!");}
+  document.getElementById('playerModal').style.display='flex';
 }
 function closePlayer(){
   document.getElementById('driveFrame').src='';
   document.getElementById('playerModal').style.display='none';
   history.replaceState(null,null,window.location.pathname);
 }
-
-// KHỞI TẠO
 window.onload = () => {
   setLoginBar();
   fetchPhimFromSheet();
@@ -222,4 +211,3 @@ window.addEventListener("hashchange", () => {
 </script>
 </body>
 </html>
-
