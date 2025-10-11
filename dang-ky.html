@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Đăng ký tài khoản – MovieHub</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:'Be Vietnam Pro',sans-serif;background:#181843;margin:0;display:flex;align-items:center;justify-content:center;height:100vh;}
+    .login-card{background:#242155;border-radius:18px;box-shadow:0 8px 42px #0006;padding:33px 39px;max-width:390px;width:97vw;}
+    h2{color:#e50914;font-weight:900;margin-top:0;}
+    label{display:block;margin-bottom:6px;font-weight:700;color:#ffe066;}
+    input[type=text],input[type=password]{width:92%;font-size:1.1em;padding:10px 16px;border-radius:8px;border:none;margin-bottom:17px;background:#232949;color:#fff;}
+    button{background:#e50914;color:#fff;font-family:'Be Vietnam Pro',sans-serif;padding:11px 31px;font-weight:900;font-size:1.1em;border:none;border-radius:11px;margin-top:4px;}
+    .msg-err{color:#fd3033;font-weight:700;margin-bottom:7px;}
+    .footer-link{margin-top:15px;}
+    a{color:#ffe066;text-decoration:underline;}
+  </style>
+</head>
+<body>
+<div class="login-card">
+  <h2>Đăng ký tài khoản</h2>
+  <form id="registerForm" autocomplete="on">
+    <label for="username">Tên đăng nhập</label>
+    <input type="text" id="username" name="username" required/>
+    <label for="password">Mật khẩu</label>
+    <input type="password" id="password" name="password" required minlength="4"/>
+    <div class="msg-err" id="errMsg"></div>
+    <button type="submit">Tạo tài khoản</button>
+  </form>
+  <div class="footer-link">
+    Đã có tài khoản? <a href="dang-nhap.html">Đăng nhập</a>
+  </div>
+</div>
+<script>
+// PHẦN BACKEND BẮT BUỘC DÙNG APPS SCRIPT nhận POST từ web client
+const APPS_SCRIPT_URL = 'YOUR_DEPLOYED_SCRIPT_URL';
+
+document.getElementById('registerForm').onsubmit = async function(e){
+  e.preventDefault();
+  let u=document.getElementById('username').value.trim(), p=document.getElementById('password').value.trim();
+  document.getElementById('errMsg').textContent='Đang đăng ký...';
+
+  if(u.length<2||p.length<4){
+    document.getElementById('errMsg').textContent='Tên đăng nhập hoặc mật khẩu quá ngắn!';
+    return;
+  }
+  // POST lên endpoint Google Apps Script
+  let resp = await fetch(APPS_SCRIPT_URL, {
+    method:'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({user:u,pass:p})
+  });
+  let dt = await resp.json();
+  if(dt.status==="exist"){
+    document.getElementById('errMsg').textContent='Tên đăng nhập đã tồn tại!';
+  }else if(dt.status==="ok"){
+    document.getElementById('errMsg').style.color="#55ff98";
+    document.getElementById('errMsg').textContent='Đăng ký thành công! Đang chuyển...';
+    setTimeout(()=>window.location.href = "dang-nhap.html",950);
+  }else{
+    document.getElementById('errMsg').textContent='Lỗi đăng ký, thử lại sau!';
+  }
+}
+</script>
+</body>
+</html>
